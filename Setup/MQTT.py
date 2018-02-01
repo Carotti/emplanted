@@ -28,11 +28,14 @@ sta_if = network.WLAN(network.STA_IF)
 
 if not sta_if.isconnected():
     sta_if.active(True)
-    sta_if.connect("EEERover", "exhibition")
+    sta_if.connect("emplanted-wifi", "emplanted")
 
-client = MQTTClient('emplanted-iot', '192.168.0.10')
+client = MQTTClient('emplanted-iot', '192.168.43.92')
 client.connect()
-payload = json.dumps({"name":"temp-reading", "data":getTemp()})
+payload = json.dumps([
+    {"name":"temp-reading", "data":getTemp()},
+    {"name":"hum-reading", "data":getHum()}
+])
 client.publish('esys/emplanted/temp', bytes(payload,'utf-8'))
 
 client.disconnect()
