@@ -1,16 +1,19 @@
 {
-	"plants": {
-		"basil": {
+	"plants": [
+		{
+            "name": "basil",
 			"temperature": "16-28",
 			"humidity": "60-90"
 		},
-		"coriander": {
+		{
+            "name": "coriander",
 			"temperature": "16-29",
 			"humidity": "60-70"
 		},
-		"parsley": {
+		{
+            "name": "parsley",
 			"temperature": "16-26",
 			"humidity": "50-70"
 		}
-	}
+	]
 }
