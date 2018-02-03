@@ -1,22 +1,18 @@
 # -*- coding: UTF-8 -*-
-from urllib.request import urlopen
-import urllib.error
-
-import sys
-
 from fbchat import Client
 from fbchat.models import *
-
-import subprocess
-from datetime import datetime
-import re
-import time
+import json
 
 import paho.mqtt.client as mqtt
 
 def send_msg(msg):
     client = Client('123composer@gmail.com', 'emplanted-wifi')
     client.send(Message(text=msg), thread_id='1042016150', thread_type=ThreadType.USER)
+    client.logout()
+
+def change_color(tc):
+    client = Client('123composer@gmail.com', 'emplanted-wifi')
+    changeThreadColor(tc, thread_id = '1042016150')
     client.logout()
 
 # The callback for when the client receives a CONNACK response from the server.
@@ -30,9 +26,13 @@ def on_connect(client, userdata, flags, rc):
 # The callback for when a PUBLISH message is received from the server.
 def on_message(client, userdata, msg):
     print(msg.topic+ " " + str(msg.payload))
-    send_msg(msg.payload)
+    payload_dict = json.loads(msg.payload)[0]
+    if (payload_dict["name"] == "warning"):
+    	change_color(ThreadColor.RADICAL_RED)
+    	send_msg(payload_dict["text"])
+    	print("Warning sent!")
 
-send_msg("Test123")
+change_color(ThreadColor.FREE_SPEECH_GREEN)
 
 client = mqtt.Client()
 client.on_connect = on_connect
