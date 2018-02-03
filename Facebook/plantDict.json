@@ -1,0 +1,38 @@
+{
+	"basil": {
+      "min-temp":       16,
+	"max-temp":       28,
+	"min-hum":        60,
+	"max-hum":        90
+	},
+	"coriander": {
+      "min-temp":       16,
+      "max-temp":       29,
+      "min-hum":        60,
+      "max-hum":        70
+	},
+	"parsley": {
+      "min-temp":       16,
+      "max-temp":       26,
+      "min-hum":        50,
+      "max-hum":        70
+	},
+	"rosemary": {
+      "min-temp":       0,
+      "max-temp":       35,
+      "min-hum":        60,
+      "max-hum":        90
+	},
+	"thyme": {
+      "min-temp":       10,
+      "max-temp":       35,
+      "min-hum":        20,
+      "max-hum":        70
+	},
+	"strawberry": {
+      "min-temp":       16,
+      "max-temp":       26,
+      "min-hum":        65,
+      "max-hum":        80
+      }
+}
