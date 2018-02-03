@@ -4,6 +4,21 @@ from machine import Pin,I2C
 import time
 import json
 
+config = [
+    {"wifi": {
+            "ssid": "emplabted-wifi",
+            "password": "emplanted#$_"
+        }
+    },
+    {"sensor": {
+            "i2c": {
+                "scl-pin": 5,
+                "sda-pin": 4
+            }
+        }
+    }
+]
+
 def rw(inAddress, outAddress):
     i2cport = I2C(scl=Pin(5), sda=Pin(4), freq=100000)
     i2cport.writeto(0x40, bytearray([inAddress]))

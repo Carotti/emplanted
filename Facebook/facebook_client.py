@@ -1,4 +1,23 @@
+# -*- coding: UTF-8 -*-
+from urllib.request import urlopen
+import urllib.error
+
+import sys
+
+from fbchat import Client
+from fbchat.models import *
+
+import subprocess
+from datetime import datetime
+import re
+import time
+
 import paho.mqtt.client as mqtt
+
+def send_msg(msg):
+    client = Client('123composer@gmail.com', 'emplanted-wifi')
+    client.send(Message(text=msg), thread_id='1042016150', thread_type=ThreadType.USER)
+    client.logout()
 
 # The callback for when the client receives a CONNACK response from the server.
 def on_connect(client, userdata, flags, rc):
@@ -10,7 +29,10 @@ def on_connect(client, userdata, flags, rc):
 
 # The callback for when a PUBLISH message is received from the server.
 def on_message(client, userdata, msg):
-    print(msg.topic+" "+str(msg.payload))
+    print(msg.topic+ " " + str(msg.payload))
+    send_msg(msg.payload)
+
+send_msg("Test123")
 
 client = mqtt.Client()
 client.on_connect = on_connect
