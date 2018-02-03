@@ -12,7 +12,7 @@ def send_msg(msg):
 
 def change_color(tc):
     client = Client('123composer@gmail.com', 'emplanted-wifi')
-    changeThreadColor(tc, thread_id = '1042016150')
+    client.changeThreadColor(tc, thread_id = '1042016150')
     client.logout()
 
 # The callback for when the client receives a CONNACK response from the server.
