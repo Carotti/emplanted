@@ -17,7 +17,7 @@ def get_infos():
 
 def send_msg(msg):
     client = Client('123composer@gmail.com', 'emplanted-wifi')
-    client.send(Message(text=msg), thread_id='1123642694406015', thread_type=ThreadType.GROUP)
+    client.send(Message(text=msg), thread_id='1042016150', thread_type=ThreadType.USER)
     client.logout()
 
 
