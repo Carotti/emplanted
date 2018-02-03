@@ -2,7 +2,6 @@
 Just a bunch of kids trying to grow plants
 
 TODO:
-<<<<<<< HEAD
 1. Buy fishtank.
 2. Magson brings LED strips.
 3. Set up network (server) communication.
@@ -22,6 +21,4 @@ TODO:
 | Colour Temperature          | Use 2 relays to turn lights on/off                                      |     |              |
 | Polling ability via chat    | Magson can do this "easy"                                               |     |              |
 | Plant suggestions           | Have a dictionary and try to match it with avg temps etc                |     |              |
-| Water tank empty warning    | Weight sensor ?                                                         |     |              |
-=======
->>>>>>> 3b1cd2d6361f6603b2c2e9ed767adaa7736c0969
+| Water tank empty warning    | Weight sensor ?
