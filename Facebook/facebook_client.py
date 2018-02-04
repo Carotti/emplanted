@@ -10,6 +10,8 @@ import urllib
 from bs4 import BeautifulSoup
 from urllib.request import urlopen
 
+import re
+
 import paho.mqtt.client as mqtt
 import time
 
@@ -23,10 +25,19 @@ def get_text(url):
     text = soup.get_text()
 
     lines = (line.strip() for line in text.splitlines())
-    chunks = (phrase.strip() for line in lines for phrase in line.split("  "))
-    # drop blank lines
-    text = '\n'.join(chunk for chunk in chunks if chunk)
-    return text
+    return list(lines)
+
+def after_sub_list_finder(big_list, sub_list):
+    current_sub_list_ind = 0
+    big_list_ind = 0;
+    for element in big_list:
+        if element == sub_list[current_sub_list_ind] or (sub_list[current_sub_list_ind] and re.compile(sub_list[current_sub_list_ind]).match(element)):
+            current_sub_list_ind = current_sub_list_ind + 1
+            if current_sub_list_ind == len(sub_list):
+                return big_list_ind + 1
+        else:
+            current_sub_list_ind = 0
+        big_list_ind = big_list_ind + 1
 
 # Subclass fbchat.Client and override required methods
 class Thefish(Client):
@@ -119,24 +130,33 @@ class Thefish(Client):
             self.send_msg("Your tank is now empty!")
 
     def remove_species(self, species_name):
-        for plant_name in self.inside_tank:
-            if plant_name == species_name:
-                self.inside_tank.remove(species_name)
+        print("Inside tank: ")
+        print(self.inside_tank)
+        print("Removing all of the " + species_name)
+        self.inside_tank = [plant for plant in self.inside_tank if plant != species_name]
 
     def onMessage(self, author_id, message_object, thread_id, thread_type, **kwargs):
         #lowercase everything to reduce variations
         text = (message_object.text).lower()
-        #list of a the words
+        if "?" in text:
+            text = text.replace("?", "")
+        #list of the words
         text_list = text.split(" ")
+        if "the" in text_list:
+            text_list.remove("the")
+        if "of" in text_list:
+            text_list.remove("of")
+
         #All the response stuff goes here
-        if (thread_id == self.fish_tank_thread_id) and (text not in self.exclude_text):
+        if (thread_id == self.fish_tank_thread_id) and ((message_object.text).lower() not in self.exclude_text):
             if "my name is " in text:
                 #Get the last word
                 self.username = text_list[-1]
                 self.send_msg("Okay " + self.username + ", I'll make sure I call you that in future!")
             if "add" in text:
                 #just in case the user says "add my basil"
-                text_list.remove("my")
+                if "my" in text_list:
+                    text_list.remove("my")
                 #the word after "add" is the plant name
                 plant_name_ind = text_list.index("add") + 1
                 #make sure we don't get index error
@@ -150,7 +170,8 @@ class Thefish(Client):
                             self.acknowledge_plant()
             if "remove" in text:
                 #just in case the user says "remove my basil"
-                text_list.remove("my")
+                if "my" in text_list:
+                    text_list.remove("my")
                 if "all" in text:
                     #either the user wants to remove all plants or all of one species
                     plant_name_ind = text_list.index("all") + 1
@@ -168,13 +189,33 @@ class Thefish(Client):
                 #the word after "remove" is the plant name
                 else:
                     #remove a single plant
-                    text_list.remove("a")
-                    text_list.remove("an")
+                    if "a" in text_list:
+                        text_list.remove("a")
+                    if "an" in text_list:
+                        text_list.remove("an")
                     plant_name_ind = text_list.index("remove") + 1
                     if plant_name_ind < len(text_list):
                         if text_list[plant_name_ind] in self.inside_tank:
                             self.inside_tank.remove(text_list[plant_name_ind])
                             self.acknowledge_plant()
+            elif "tell me about " in text or "how " in text:
+                plant_name = ""
+                for name in text_list:
+                    if name in self.plant_data:
+                        plant_name = name
+
+                if plant_name:
+                    if "grow" in text or "care" in text or "requirements" in text:
+                        self.get_care_instr(plant_name)
+                    elif "harvest" in text:
+                        self.get_harvest(plant_name)
+                    elif "use" in text:
+                        self.get_uses(plant_name)
+                    elif "seed" in text or "spread" in text:
+                        self.get_seeding(plant_name)
+                    else:
+                        self.get_description(plant_name)
+
             if self.WelcomeDialog:
                 #We don't know what the name of the user is
                 if not (self.username):
@@ -203,6 +244,47 @@ class Thefish(Client):
                     self.WelcomeDialog = 0
             else:
                 pass
+    def get_description(self, plant_name):
+        info_list = get_text(self.plant_data[plant_name]["url"])
+        desc_ind = after_sub_list_finder(info_list, ['Description', ''])
+        if desc_ind:
+            self.send_msg(info_list[desc_ind])
+
+    def get_uses(self, plant_name):
+        info_list = get_text(self.plant_data[plant_name]["url"])
+        uses_ind = after_sub_list_finder(info_list, ['Uses', ''])
+        if uses_ind:
+            self.send_msg(info_list[uses_ind])
+
+    def get_care_instr(self, plant_name):
+        info_list = get_text(self.plant_data[plant_name]["url"])
+        propagation_ind = after_sub_list_finder(info_list, ['', 'Propagation'])
+        if propagation_ind:
+            for line in info_list[propagation_ind:]:
+                if line.lower() == "common pests and diseases" or line.lower() == "references":
+                    break
+                elif len(line) > 40:
+                    self.send_msg(line)
+
+    def get_seeding(self, plant_name):
+        info_list = get_text(self.plant_data[plant_name]["url"])
+        seeding_ind = after_sub_list_finder(info_list, ['', 'Propagation'])
+        if seeding_ind:
+            for line in info_list[seeding_ind:]:
+                if line.lower() == "common pests and diseases" or line.lower() == "references":
+                    break
+                elif "seed" in line and len(line) > 40:
+                    self.send_msg(line)
+
+    def get_harvest(self, plant_name):
+        info_list = get_text(self.plant_data[plant_name]["url"])
+        harvesting_ind = after_sub_list_finder(info_list, ['', 'Harvest[a-z]*'])
+        if harvesting_ind:
+            self.send_msg(info_list[harvesting_ind])
+
+    def get_disease(self, plant_name, keywords):
+        #Do some fancy regex stuff here!
+        pass
 
 
 
