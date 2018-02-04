@@ -3,7 +3,7 @@
       "min-temp":       16,
 	"max-temp":       28,
 	"min-hum":        60,
-	"max-hum":        90
+	"max-hum":        90,
 	},
 	"coriander": {
       "min-temp":       16,

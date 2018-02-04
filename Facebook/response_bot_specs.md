@@ -17,19 +17,21 @@ https://fbchat.readthedocs.io/en/master/examples.html
 
 Remember never to echo messages when you are the author of the message otherwise you will have an infinite loop of never ending echos.
 
-|           Features          |                                      How we do it                                     | Implemented? |
-|-----------------------------|---------------------------------------------------------------------------------------|--------------|
-| Need                        |                                                                                       |              |
-| Extreme temperature warning |                                                                                       |              |
-| What's wrong?               | Tell user which plants are outside ideal temp/humidity range                          |              |
-| Setup instructions          |                                                                                       |              |
-| Should                      |                                                                                       |              |
-| Water/humidity control      | "Water my plant"                                                                      |              |
-| Heater control              | "Increase temperature", "make it hotter"                                              |              |
-| Suggestions                 | "Suggest me a plant"                                                                  |              |
-| Could                       |                                                                                       |              |
-| Seasonal suggestions        | "Now would be a great time to seed/fertilise/harvest XYZ"                             |              |
-| Height warning              | "Your plants are ready to harvest!"                                                   |              |
-| Water tank empty warning    | Weight sensor ?                                                                       |              |
-| Common disease diagnosis    | "Spots on leaf" = Fungul infection, lower humidity, "Curled up leaves" = too dry etc. |              |
-| What's up?                  | Sends emoji representing plants current state                                                                                      |              |
+|           Features          |                                               How we do it                                               | Implemented? |
+|-----------------------------|----------------------------------------------------------------------------------------------------------|--------------|
+| Need                        |                                                                                                          |              |
+| Extreme temperature warning |                                                                                                          | Yup          |
+| What's wrong?               | Tell user which plants are outside ideal temp/humidity range                                             |              |
+| Setup instructions          |                                                                                                          | Yup          |
+| Should                      |                                                                                                          |              |
+| Water/humidity control      | "Water my plant"                                                                                         |              |
+| Heater control              | "Increase temperature", "make it hotter"                                                                 |              |
+| Suggestions                 | "Suggest me a plant"                                                                                     |              |
+| Could                       |                                                                                                          |              |
+| Seasonal suggestions        | "Now would be a great time to seed/fertilise/harvest XYZ"                                                |              |
+| Height warning              | "Your plants are ready to harvest!"                                                                      |              |
+| Water tank empty warning    | Weight sensor ?                                                                                          |              |
+| Common disease diagnosis    | "Spots on leaf" = Fungul infection, lower humidity, "Curled up leaves" = too dry etc.                    |              |
+| What's up?                  | Sends emoji representing plants current state                                                            |              |
+| Plot graphs                 | Plot graphs of stats of plant health, temps, humidity over time us matplotlib and send them to the chat! |              |
+| Suggest recipes             | "What can I use basil for?"                                                                              |              |
