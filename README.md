@@ -18,6 +18,6 @@ TODO:
 | Could                       |                                                                         |              |
 | Height warning              | IR beam break sensor                                                    |              |
 | Colour Temperature          | Use 2 relays to turn lights on/off                                      |              |
-| Polling ability via chat    | Magson can do this "easy"                                               |              |
+| Polling ability via chat    | Magson can do this "easy"                                               | EASY         |
 | Plant suggestions           | Have a dictionary and try to match it with avg temps etc                |              |
 | Water tank empty warning    | Weight sensor ?                                                         |              |
