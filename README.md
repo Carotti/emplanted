@@ -2,9 +2,8 @@
 Just a bunch of kids trying to grow plants
 
 TODO:
-1. Buy fishtank.
-2. Magson brings LED strips.
-3. Set up network (server) communication.
+1. get fb client to rate health out of 10
+2. get basic functionality in hw sorted
 
 |           Features          |                               How we do it                              | Implemented? |
 |-----------------------------|-------------------------------------------------------------------------|--------------|
