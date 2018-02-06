@@ -14,6 +14,7 @@ import re
 
 import paho.mqtt.client as mqtt
 import time
+from datetime import datetime
 
 def get_text(url):
     html = urlopen(url).read()
@@ -47,6 +48,10 @@ class Thefish(Client):
 
         #initial tank statistics, needs to change at regular interval
         self.tank_stats = {"temp": [], "hum": []}
+        self.daily_stats = {"temp": [], "hum": []}
+
+        #log the current day and month to check for new day
+        self.old_dt = datetime.now()
 
         #the name of the rich guy/girl
         self.username = ""
@@ -84,6 +89,25 @@ class Thefish(Client):
     def calculate_health(self):
         #Needs to look at tank_stats, plant_data and inside_tank
         #returns a rating from 1 to 10
+        dev = 0;
+        for plant in self.inside_tank:
+            maxTemp = self.plant_data[plant]["max-temp"]
+            minTemp = self.plant_data[plant]["min-temp"]
+            maxHum = self.plant_data[plant]["max-hum"]
+            minHum = self.plant_data[plant]["min-hum"]
+            currentTemp = self.tank_stats["temp"][-1]
+            currentHum = self.tank_stats["hum"][-1]
+            if currentTemp > maxTemp:
+                dev += currentTemp - maxTemp
+            else if currentTemp < minTemp:
+                dev += minTemp - currentTemp
+            if currentHum > maxHum:
+                dev += currentHum - maxHum
+            else if currentHum < minHum:
+                dev += minHum - currentHum
+        avgDev = dev/len(self.inside_tank)
+        self.set_color_to_plant_health(int(round(avgDev)))
+
         pass
 
     def set_color_to_plant_health(self, health_level):
@@ -107,11 +131,24 @@ class Thefish(Client):
         self.change_color(health_bar_colors[health_level])
 
     def inform_user(self, info_dict):
-        if (info_dict["name"] == "warning"):
-            set_color_to_plant_health(1)
-            self.send_msg(payload_dict["text"])
-            print("Warning sent!")
-        # change tank_stats
+        pass
+
+
+    def log_readings(self, info_dict):
+        #TODO needs to store the current reading inside the self.tank_stats
+        # Check if it is a new day using python datetime
+        # If it is a new day append the average of the tank_stats list into the daily_stats
+        # tank_stats = []
+        # If daily_stats is greater than length 30, delete the first in the listen
+        # If the current reading is outside the range of one of the plants, send a message to the user saying which plants are unhappy and why
+
+        current_date_time = datetime.now()
+        if self.old_dt.hour != current_date_time.hour:
+            self.tank_stats["temp"] = info_dict["temp"]
+            self.tank_stats["hum"] = info_dict["hum"]
+            self.oldt_dt = current_date_time
+        if self
+
 
     def acknowledge_plant(self):
         #Acknowledge that tank plants have changed
@@ -308,6 +345,7 @@ def on_message(client, userdata, msg):
     print(msg.topic+ " " + str(msg.payload))
     payload_dict = json.loads(msg.payload)[0]
     fb_client.inform_user(payload_dict)
+
 
 #All the MQTT stuff - uncomment out when you have the board:
 
