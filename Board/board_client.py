@@ -1,17 +1,22 @@
 from umqtt.simple import MQTTClient
 import network
 from machine import Pin,I2C
+import machine
 import time
 import json
 
-config = {
+boardConfig = {
     "network": {
         "ssid": "emplanted-wifi",
         "password": "emplanted#$_"
     },
     "mqtt": {
         "name": "emplanted-iot",
-        "broker": "192.168.43.92"
+        "broker": "192.168.43.92",
+        "topic": "esys/emplanted/",
+        "subscriptions": [
+            "lights"
+        ]
     },
     "th-sensor": {
         "scl": 5,
@@ -22,6 +27,10 @@ config = {
             "measure-hum": 0xF5,
             "measure-temp": 0xF3
         }
+    },
+    "lights": {
+        "pin": 14,
+        "default-state": 0
     }
 }
 
@@ -50,24 +59,68 @@ class THSensor:
         hum_perc = (125*hum/65536) - 6
         return hum_perc
 
+class Lights:
+    def __init__(self, config):
+        self.pin = Pin(config["pin"], Pin.OUT)
+        self.pin.value(config["default-state"])
+
+    def enable(self):
+        self.pin.value(0)
+
+    def disable(self):
+        self.pin.value(1)
+
 class EmplantedBoard:
+    def mqttReceivedLights(self, msg):
+        if (msg == "ON"):
+            self.lights.enable()
+        elif (msg == "OFF"):
+            self.lights.disable()
+
+    def mqttReceived(self, topic, msg):
+        topicStr = topic.decode("utf-8")
+        msgStr = msg.decode("utf-8")
+
+        if topicStr == (self.mqttTopic + "lights"):
+            self.mqttReceivedLights(msgStr)
+
     def __init__(self, config):
         ap_if = network.WLAN(network.AP_IF)
         ap_if.active(False)
 
         sta_if = network.WLAN(network.STA_IF)
 
-        if not sta_if.isconnected():
-            sta_if.active(True)
-            sta_if.connect(config["network"]["ssid"], config["network"]["password"])
+        sta_if.active(True)
+        sta_if.connect(config["network"]["ssid"], config["network"]["password"])
+
+        while not sta_if.isconnected():
+            machine.idle()
 
         self.mqttClient = MQTTClient(config["mqtt"]["name"], config["mqtt"]["broker"])
+        self.mqttTopic = config["mqtt"]["topic"]
+        self.mqttClient.set_callback(self.mqttReceived)
         self.mqttClient.connect()
+        for i in config["mqtt"]["subscriptions"]:
+            self.mqttClient.subscribe(self.mqttTopic + i)
 
         self.thSensor = THSensor(config["th-sensor"])
 
-board = EmplantedBoard(config)
+        self.lights = Lights(config["lights"])
 
+    def mqttPublish(self, topic, payload):
+        self.mqttClient.publish(self.mqttTopic + topic, bytes(payload, 'utf-8'))
+
+    def mqttCheck(self):
+        self.mqttClient.check_msg()
+
+    def mqttWait(self):
+        self.mqttClient.wait_msg()
+
+board = EmplantedBoard(boardConfig)
+
+while True:
+    board.mqttCheck()
+    time.sleep(1)
 
 # payload = json.dumps([
 #     {"name":"temp-reading", "data":getTemp()},
