@@ -80,16 +80,15 @@ class EmplantedBoard:
 
     def mqttReceivedRequest(self, msg):
         requests = json.loads(msg)
-        readings = []
+        readings = {}
         for i in requests:
             reading = None
             if i == "temp":
                 reading = self.thSensor.getTemp()
             elif i == "hum":
                 reading = self.thSensor.getHum()
-            payload = json.dumps({i: readings})
-            readings.append(payload)
-        self.mqttPublish("readings", readings)
+            readings[i] = reading
+        self.mqttPublish("readings", json.dumps(readings))
 
     def mqttReceived(self, topic, msg):
         topicStr = topic.decode("utf-8")
