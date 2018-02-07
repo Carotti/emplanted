@@ -66,6 +66,7 @@ class Thefish(Client):
         self.fish_tank_thread_id = '1863119160367263'
         self.lights_off_time = None
         self.lights_on_time = None
+        self.last_hum_dev = 0;
 
         # On time, off time
         self.lights_schedule = [None, None]
@@ -174,16 +175,19 @@ class Thefish(Client):
                 self.send_msg("Your " + plant + " is " + problem + emojis_dict[problem][random_emoji_index])
 
         if hum_dev > 10:
-            #SPRAY WATER
+            # TODO SPRAY WATER
+            if (last_hum_dev == hum_dev){
+              # TODO Then the water is probably empty - I think we need to truncate the humidity for this.
+            }
             pass
         elif hum_dev < -10:
-            #TURN ON FAN
+            # TODO TURN ON FAN
             pass
         elif temp_dev > 10:
-            #TURN ON FAN
+            # TODO TURN ON FAN
             pass
         elif temp_dev < -10:
-            #TURN ON HEATER
+            # TODO TURN ON HEATER
             pass
 
         self.unhappy_plants = new_unhappy_plants
