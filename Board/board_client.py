@@ -47,13 +47,14 @@ class THSensor:
         self.commands = config["commands"]
         self.wrt-htr = config["htr-ctrl-cmd"]
         self.htr-value = config["htr-ctrl-value"]
+        self.htr-strt = config["user-reg1"]
         self.setHtrCtrl()
 
     def setHtrCtrl(self):
         i2cport = I2C(scl=Pin(self.scl), sda=Pin(self.sda), freq=self.freq)
-        write(self.wrt-htr, i2cport) #Command for writing to heater
+        write(self.wrt-htr, i2cport) # Command for writing to heater
         time.sleep(0.1) # Hack, but important (Maybe????)!
-        write(self.htr-value, i2cport) #Value to be written to heater
+        write(self.htr-value, i2cport) # Value to be written to heater
 
 
     def write(self, inAddress, i2cport):
@@ -73,6 +74,12 @@ class THSensor:
         return temp_celsius
 
     def getHum(self):
+        i2cport = I2C(scl=Pin(self.scl), sda=Pin(self.sda), freq=self.freq)
+        write(self.htr-strt, i2cport) # Command for writing to user register 1
+        write(0x4, i2cport) # Turn on heater, bit 2 of user register 1
+        time.sleep(10) # Sleep for 10 seconds to drive off condensation
+        write(self.htr-strt, i2cport) # Command for writing to user register 1
+        write(0x0, i2cport) # Turn off heater, bit 2 of user register 1
         hum = int.from_bytes(self.rw(self.commands["measure-hum"], self.slaveAddr), 'big')
         hum_perc = (125*hum/65536) - 6
         return hum_perc
