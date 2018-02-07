@@ -92,6 +92,8 @@ class Thefish(Client):
         #So it doesn't reply to itself
         self.exclude_text = []
 
+        self.display_status = False
+
         #Startup greeting
         if not DEBUG:
             self.send_msg("Hi, I am your new smart planter :) ! What may I call you?")
@@ -227,8 +229,8 @@ class Thefish(Client):
 
 
         if current_date_time.date() != self.old_dt.date():
-            self.daily_stats["temp"].append(sum(self.tank_stats["temp"])/len(self.tank_stats["temp"]))
-            self.daily_stats["hum"].append(sum(self.tank_stats["hum"])/len(self.tank_stats["hum"]))
+            self.daily_stats["temp"].append(sum(self.tank_stats["temp"])/max(len(self.tank_stats["temp"]), 1))
+            self.daily_stats["hum"].append(sum(self.tank_stats["hum"])max/(len(self.tank_stats["hum"]), 1))
             if len(self.daily_stats["temp"]) > 64:
                 self.daily_stats["temp"] = self.daily_stats["temp"][1:]
             if len(self.daily_stats["hum"]) > 64:
@@ -239,6 +241,9 @@ class Thefish(Client):
         self.tank_stats["hum"].append(info_dict["hum"])
         self.old_dt = current_date_time
         self.calculate_health(info_dict["temp"], info_dict["hum"])
+        if self.display_status:
+            self.display_status = False
+            send_msg("The temperature inside the planter is " + info_dict["temp"] + "degrees and the humidity is " + info_dict["hum"])
 
     def lights_off(self):
         print ("CALLING LIGHTS OFF")
@@ -470,7 +475,17 @@ class Thefish(Client):
 
                 print("Lights schedule: ")
                 print(self.lights_schedule)
-
+            elif "what" in text and ("up" in text or "reading" in text or "status" in text):
+                self.unhappy_plants = {"too cold": [], "too hot": [], "too dry": [], "too humid": []}
+                self.display_status = True
+                client.publish('esys/emplanted/request', bytes(payload, 'utf-8'))
+            elif "what" in text:
+                for plant_name in text_list:
+                    if plant_name in self.inside_tank:
+                        for problem in ["too cold", "too hot", "too dry", "too humid"]:
+                            if plant_name in self.unhappy_plants[problem]:
+                                self.unhappy_plants[problem].remove(plant_name)
+                client.publish('esys/emplanted/request', bytes(payload, 'utf-8'))
             if self.WelcomeDialog:
                 #We don't know what the name of the user is
                 if not (self.username):
@@ -575,7 +590,7 @@ def on_connect(client, userdata, flags, rc):
 # The callback for when a PUBLISH message is received from the server.
 def on_message(client, userdata, msg):
     print(msg.topic+ " " + str(msg.payload))
-    payload_dict = json.loads(msg.payload)[0]
+    payload_dict = json.loads(msg.payload.decode("utf-8"))
     fb_client.log_readings(payload_dict)
 
 client.on_connect = on_connect
