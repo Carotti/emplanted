@@ -24,6 +24,9 @@ boardConfig = {
         "sda": 4,
         "freq": 100000,
         "slave-addr": 0x40,
+        "htr-ctrl-value" : 0xF,
+        "htr-write-cmd" : 0x51,
+        "user-reg1" : 0xE6,
         "commands": {
             "measure-hum": 0xF5,
             "measure-temp": 0xF3
@@ -42,10 +45,24 @@ class THSensor:
         self.freq = config["freq"]
         self.slaveAddr = config["slave-addr"]
         self.commands = config["commands"]
+        self.wrt-htr = config["htr-ctrl-cmd"]
+        self.htr-value = config["htr-ctrl-value"]
+        self.setHtrCtrl()
+
+    def setHtrCtrl(self):
+        i2cport = I2C(scl=Pin(self.scl), sda=Pin(self.sda), freq=self.freq)
+        write(self.wrt-htr, i2cport) #Command for writing to heater
+        time.sleep(0.1)
+        write(self.htr-value, i2cport) #Value to be written to heater
+
+
+    def write(self, inAddress, i2cport):
+        i2cport.writeto(self.slaveAddr, bytearray([inAddress]))
+        pass
 
     def rw(self, inAddress, outAddress):
         i2cport = I2C(scl=Pin(self.scl), sda=Pin(self.sda), freq=self.freq)
-        i2cport.writeto(self.slaveAddr, bytearray([inAddress]))
+        write(inAddress, i2cport)
         time.sleep(0.1) # Hack, but important!
         data=i2cport.readfrom(outAddress, 2) # Read 2 bytes
         return data
