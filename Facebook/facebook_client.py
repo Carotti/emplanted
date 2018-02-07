@@ -20,7 +20,6 @@ import datetime
 
 DEBUG = True
 
-
 def get_text(url):
     html = urlopen(url).read()
     soup = BeautifulSoup(html, "lxml")
@@ -50,6 +49,10 @@ def times_match(time1, time2):
         return True
     else:
         return False
+
+#All the MQTT stuff - uncomment out when you have the board:
+
+client = mqtt.Client()
 
 # Subclass fbchat.Client and override required methods
 class Thefish(Client):
@@ -574,27 +577,22 @@ def on_message(client, userdata, msg):
     payload_dict = json.loads(msg.payload)[0]
     fb_client.log_readings(payload_dict)
 
+client.on_connect = on_connect
+client.on_message = on_message
 
-#All the MQTT stuff - uncomment out when you have the board:
+client.connect("localhost", 1883, 60)
 
-# client = mqtt.Client()
+def poll_sensors():
+    #Poll every minute
+    payload = json.dumps([{"name":"Poll", "text":"gimme temp and hum"}])
+    client.publish('esys/emplanted/request', bytes(payload, 'utf-8'))
+    time.sleep(60)
 
-# client.on_connect = on_connect
-# client.on_message = on_message
+polling_always_on_thread = threading.Thread(target = poll_sensors)
+polling_always_on_thread.start()
 
-# client.connect("localhost", 1883, 60)
-
-# def poll_sensors():
-#     #Poll every minute
-#     payload = json.dumps([{"name":"Poll", "text":"gimme temp and hum"}])
-#     client.publish('esys/emplanted/request', bytes(payload, 'utf-8'))
-#     time.sleep(60)
-
-# polling_always_on_thread = threading.Thread(target = poll_sensors)
-# polling_always_on_thread.start()
-
-# # Blocking call that processes network traffic, dispatches callbacks and
-# # handles reconnecting.
-# # Other loop*() functions are available that give a threaded interface and a
-# # manual interface.
-# client.loop_forever()
+# Blocking call that processes network traffic, dispatches callbacks and
+# handles reconnecting.
+# Other loop*() functions are available that give a threaded interface and a
+# manual interface.
+client.loop_forever()
