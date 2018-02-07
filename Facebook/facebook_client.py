@@ -45,7 +45,7 @@ def after_sub_list_finder(big_list, sub_list):
         big_list_ind = big_list_ind + 1
 
 def times_match(time1, time2):
-    if time1.hour == time2.hour and abs(time1.minute - time2.minute) < 3:
+    if (time1.hour == time2.hour) and (time1.minute == time2.minute):
         return True
     else:
         return False
@@ -53,6 +53,11 @@ def times_match(time1, time2):
 #All the MQTT stuff - uncomment out when you have the board:
 
 client = mqtt.Client()
+
+request_payload = json.dumps(["temp", "hum"])
+
+def send_request():
+    client.publish('esys/emplanted/request', bytes(request_payload, 'utf-8'))
 
 # Subclass fbchat.Client and override required methods
 class Thefish(Client):
@@ -219,16 +224,18 @@ class Thefish(Client):
         if self.lights_off_time:
             if times_match(current_date_time, self.lights_off_time):
                 self.lights_off()
+                self.lights_off_time = None
         if self.lights_on_time:
             if times_match(current_date_time, self.lights_on_time):
                 self.lights_on()
+                self.lights_on_time = None
 
         # On time, off time
         if self.lights_schedule[0]:
             if times_match(current_date_time, self.lights_schedule[0]):
                 self.lights_on()
             elif times_match(current_date_time, self.lights_schedule[1]):
-                self.light_off()
+                self.lights_off()
 
 
         if current_date_time.date() != self.old_dt.date():
@@ -246,7 +253,7 @@ class Thefish(Client):
         self.calculate_health(info_dict["temp"], info_dict["hum"])
         if self.display_status:
             self.display_status = False
-            self.send_msg("The temperature inside the planter is " + info_dict["temp"] + "degrees and the humidity is " + info_dict["hum"])
+            self.send_msg("The temperature inside the planter is " + str(info_dict["temp"]) + u'\U000000B0' + "C and the humidity is " + str(info_dict["hum"]) + "%.")
 
     def lights_off(self):
         print ("CALLING LIGHTS OFF")
@@ -362,7 +369,7 @@ class Thefish(Client):
                         if text_list[plant_name_ind] in self.inside_tank:
                             self.inside_tank.remove(text_list[plant_name_ind])
                             self.acknowledge_plant()
-            elif "tell me about " in text or "how " in text:
+            elif "tell me about " in text or ("how " in text and "do" in text):
                 plant_name = ""
                 for name in text_list:
                     if name in self.plant_data:
@@ -395,7 +402,7 @@ class Thefish(Client):
 
                 float_pattern = re.compile("\d+\.?\d*")
                 time_delay_float = 0.0
-                if "in" in text:
+                if "in " in text:
                     #Turn lights of in 10 minutes
                     if "hour" in text:
                         for t in text_list:
@@ -408,7 +415,7 @@ class Thefish(Client):
                             self.set_delay_schedule(on, datetime.datetime.now() + datetime.timedelta(minutes = 15) + datetime.timedelta(hours = time_delay_float))
                         else:
                             self.set_delay_schedule(on, datetime.datetime.now() + datetime.time_delay_float(hours = time_delay_float))
-                    elif "minutes" in text:
+                    elif "minute" in text:
                         for t in text_list:
                             if float_pattern.match(t):
                                 time_delay_float = time_delay_float + float(t)
@@ -481,15 +488,15 @@ class Thefish(Client):
             elif "what" in text and ("up" in text or "reading" in text or "status" in text):
                 self.unhappy_plants = {"too cold": [], "too hot": [], "too dry": [], "too humid": []}
                 self.display_status = True
-                client.publish('esys/emplanted/request', bytes(payload, 'utf-8'))
-            elif "what" in text:
+                send_request()
+            elif ("what" in text) or ("how" in text):
                 for plant_name in text_list:
                     if plant_name in self.inside_tank:
                         for problem in ["too cold", "too hot", "too dry", "too humid"]:
                             if plant_name in self.unhappy_plants[problem]:
                                 self.unhappy_plants[problem].remove(plant_name)
                         self.plant_of_interest = plant_name
-                client.publish('esys/emplanted/request', bytes(payload, 'utf-8'))
+                send_request()
             if self.WelcomeDialog:
                 #We don't know what the name of the user is
                 if not (self.username):
@@ -604,9 +611,8 @@ client.connect("localhost", 1883, 60)
 
 def poll_sensors():
     #Poll every minute
-    payload = json.dumps(["temp", "hum"])
     while (True):
-        client.publish('esys/emplanted/request', bytes(payload, 'utf-8'))
+        send_request()
         time.sleep(60)
 
 polling_always_on_thread = threading.Thread(target = poll_sensors)
