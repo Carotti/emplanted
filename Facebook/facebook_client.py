@@ -16,7 +16,7 @@ import re
 
 import paho.mqtt.client as mqtt
 import time
-from datetime import datetime, timedelta
+import datetime
 
 DEBUG = True
 
@@ -45,6 +45,12 @@ def after_sub_list_finder(big_list, sub_list):
             current_sub_list_ind = 0
         big_list_ind = big_list_ind + 1
 
+def times_match(time1, time2):
+    if time1.hour == time2.hour and abs(time1.minute - time2.minute) < 3:
+        return True
+    else:
+        return False
+
 # Subclass fbchat.Client and override required methods
 class Thefish(Client):
     def __init__(self, user, password):
@@ -54,7 +60,7 @@ class Thefish(Client):
         self.lights_on_time = None
 
         # On time, off time
-        self.lights_schedule = []
+        self.lights_schedule = [None, None]
 
         #initial tank statistics, needs to change at regular interval
         self.tank_stats = {"temp": [], "hum": []}
@@ -63,7 +69,7 @@ class Thefish(Client):
         self.unhappy_plants = {"too cold": [], "too hot": [], "too dry": [], "too humid": []}
 
         #log the current day and month to check for new day
-        self.old_dt = datetime.now()
+        self.old_dt = datetime.datetime.now()
 
         #the name of the rich guy/girl
         self.username = ""
@@ -84,7 +90,8 @@ class Thefish(Client):
         self.exclude_text = []
 
         #Startup greeting
-        self.send_msg("Hi, I am your new fish tank :) ! What may I call you?")
+        if not DEBUG:
+            self.send_msg("Hi, I am your new smart planter :) ! What may I call you?")
 
     def send_msg(self, msg):
         #send a message
@@ -199,7 +206,23 @@ class Thefish(Client):
         # If daily_stats is greater than length 30, delete the first in the listen
         # If the current reading is outside the range of one of the plants, send a message to the user saying which plants are unhappy and why
 
-        current_date_time = datetime.now()
+        current_date_time = datetime.datetime.now()
+
+        if self.lights_off_time:
+            if times_match(current_date_time, self.lights_off_time):
+                self.lights_off()
+        if self.lights_on_time:
+            if times_match(current_date_time, self.lights_on_time):
+                self.lights_on()
+
+        # On time, off time
+        if self.lights_schedule[0]:
+            if times_match(current_date_time, self.lights_schedule[0]):
+                self.lights_on()
+            elif times_match(current_date_time, self.lights_schedule[1]):
+                self.light_off()
+
+
         if current_date_time.date() != self.old_dt.date():
             self.daily_stats["temp"].append(sum(self.tank_stats["temp"])/len(self.tank_stats["temp"]))
             self.daily_stats["hum"].append(sum(self.tank_stats["hum"])/len(self.tank_stats["hum"]))
@@ -217,16 +240,18 @@ class Thefish(Client):
     def lights_off(self):
         # TODO send message to board to turn off lights
         if DEBUG:
-            send_msg("THE LIGHTS ARE NOW OFF")
+            self.send_msg("THE LIGHTS ARE NOW OFF")
 
     def lights_on(self):
         # TODO send message to board to turn on lights
         if DEBUG:
-            send_msg("THE LIGHTS ARE NOW ON")
+            self.send_msg("THE LIGHTS ARE NOW ON")
 
     def set_light_schedule(self, on_t, off_t):
-        self.lights_on_time = on_t
-        self.lights_off_time = off_t
+        self.lights_schedule[0] = on_t
+        self.lights_schedule[1] = off_t
+        if (self.lights_schedule[1].hour - self.lights_schedule[0].hour < 8):
+            self.send_msg("Your plants might need more than 8 hours of light! Please put me in a sunny place " + u'\U0001F60E')
 
 
     def set_delay_schedule(self, on, time):
@@ -355,19 +380,92 @@ class Thefish(Client):
                 on = True
                 if "off" in text:
                     on = False;
-                if "hour" in text:
-                    time_delay_float = 0.0
-                    pattern = re.compile("\d+\.?\d*")
+
+                float_pattern = re.compile("\d+\.?\d*")
+                time_delay_float = 0.0
+                if "in" in text:
+                    #Turn lights of in 10 minutes
+                    if "hour" in text:
+                        for t in text_list:
+                            if float_pattern.match(t):
+                                time_delay_float = time_delay_float + float(t)
+                                break
+                        if "half" in text:
+                            self.set_delay_schedule(on, datetime.datetime.now() + datetime.timedelta(minutes = 30) + datetime.timedelta(hours = time_delay_float))
+                        elif "quarter" in text:
+                            self.set_delay_schedule(on, datetime.datetime.now() + datetime.timedelta(minutes = 15) + datetime.timedelta(hours = time_delay_float))
+                        else:
+                            self.set_delay_schedule(on, datetime.datetime.now() + datetime.time_delay_float(hours = time_delay_float))
+                    elif "minutes" in text:
+                        for t in text_list:
+                            if float_pattern.match(t):
+                                time_delay_float = time_delay_float + float(t)
+                                break
+                        self.set_delay_schedule(on, datetime.datetime.now() + datetime.timedelta(minutes = time_delay_float))
+                elif "every" in text or "daily" in text:
+                    #turn on lights every day at 6:30
+                    time_pattern = re.compile("\d+:\d+(pm)?(am)?")
+                    lazy_time_pattern = re.compile("\d+(pm)?(am)?")
+                    # e.g. 7 o clock
+                    lazy_time = ("clock" in text) or ((("pm" in text) or ("am" in text)) and (":" not in text))
+                    start_time = None
+                    end_time = None
+                    hours_int = 0
+                    minutes_int = 0
                     for t in text_list:
-                        if pattern.match(t):
-                            time_delay_float = time_delay_float + float(t)
-                            break
-                    if "half" in text:
-                        self.set_delay_schedule(on, datetime.now() + timedelta(minutes = 30) + timedelta(hours = time_delay_float))
-                    elif "quarter" in text:
-                        self.set_delay_schedule(on, datetime.now() + timedelta(minutes = 15) + timedelta(hours = time_delay_float))
-                    else:
-                        self.set_delay_schedule(on, datetime.now() + time_delay_float(hours = time_delay_float))
+                        if time_pattern.match(t):
+                            hours_minutes_strings = t.split(":")
+                            if "m" in t:
+                                hours_int = int(hours_minutes_strings[0]) + (("p" in hours_minutes_strings[1])*12)
+                                minutes_int = int(hours_minutes_strings[1][:-2])
+                            else:
+                                hours_int = int(hours_minutes_strings[0])
+                                minutes_int = int(hours_minutes_strings[1])
+
+                            if not start_time:
+                                start_time = datetime.time(hours_int, minutes_int)
+                            else:
+                                end_time = datetime.time(hours_int, minutes_int)
+                        elif lazy_time and lazy_time_pattern.match(t):
+                            if "m" in t:
+                                hours_int = int(t[:-2]) + (("p" in t)*12)
+                            else:
+                                hours_int = int(t)
+                            if not start_time:
+                                start_time = datetime.time(hours_int)
+                            else:
+                                end_time = datetime.time(hours_int)
+                        elif float_pattern.match(t):
+                            time_delay_float = float(t)
+                            print("REGEX time_delay_float: ")
+                            print(time_delay_float)
+
+                    if not end_time:
+                        end_time = start_time
+                        if "hour" in text:
+                            if "half" in text:
+                                time_delay_float = time_delay_float + 0.5
+                            elif "quarter" in text:
+                                time_delay_float = time_delay_float + 0.25
+                            time_delay_float = time_delay_float * 60
+
+                        print("hours: ")
+                        print(end_time.hour + int(time_delay_float/60))
+                        end_time = end_time.replace(minute = end_time.minute + round(time_delay_float % 60), hour = end_time.hour + int(time_delay_float/60))
+
+                    self.set_light_schedule(start_time, end_time)
+                elif on:
+                    self.lights_on()
+                else:
+                    self.lights_off()
+
+                print("Lights on time: ")
+                print(self.lights_on_time)
+                print("Lights off time: ")
+                print(self.lights_off_time)
+
+                print("Lights schedule: ")
+                print(self.lights_schedule)
 
             if self.WelcomeDialog:
                 #We don't know what the name of the user is
