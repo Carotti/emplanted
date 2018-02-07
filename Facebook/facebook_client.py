@@ -94,6 +94,8 @@ class Thefish(Client):
 
         self.display_status = False
 
+        self.plant_of_interest = ""
+
         #Startup greeting
         if not DEBUG:
             self.send_msg("Hi, I am your new smart planter :) ! What may I call you?")
@@ -151,7 +153,8 @@ class Thefish(Client):
                 if plant in self.unhappy_plants[problem]:
                     was_unhappy = True
                     break
-            if was_unhappy:
+            if was_unhappy or (plant == self.plant_of_interest):
+                self.plant_of_interest = ""
                 self.send_msg("Your " + plant + " is now happy!" + u'\U0001F389')
 
         emojis_dict = {"too cold": [u'\U0001F623', u'\U0001F62B', u'\U0001F630', u'\U0001F631'],
@@ -230,7 +233,7 @@ class Thefish(Client):
 
         if current_date_time.date() != self.old_dt.date():
             self.daily_stats["temp"].append(sum(self.tank_stats["temp"])/max(len(self.tank_stats["temp"]), 1))
-            self.daily_stats["hum"].append(sum(self.tank_stats["hum"])max/(len(self.tank_stats["hum"]), 1))
+            self.daily_stats["hum"].append(sum(self.tank_stats["hum"])/max(len(self.tank_stats["hum"]), 1))
             if len(self.daily_stats["temp"]) > 64:
                 self.daily_stats["temp"] = self.daily_stats["temp"][1:]
             if len(self.daily_stats["hum"]) > 64:
@@ -243,7 +246,7 @@ class Thefish(Client):
         self.calculate_health(info_dict["temp"], info_dict["hum"])
         if self.display_status:
             self.display_status = False
-            send_msg("The temperature inside the planter is " + info_dict["temp"] + "degrees and the humidity is " + info_dict["hum"])
+            self.send_msg("The temperature inside the planter is " + info_dict["temp"] + "degrees and the humidity is " + info_dict["hum"])
 
     def lights_off(self):
         print ("CALLING LIGHTS OFF")
@@ -485,6 +488,7 @@ class Thefish(Client):
                         for problem in ["too cold", "too hot", "too dry", "too humid"]:
                             if plant_name in self.unhappy_plants[problem]:
                                 self.unhappy_plants[problem].remove(plant_name)
+                        self.plant_of_interest = plant_name
                 client.publish('esys/emplanted/request', bytes(payload, 'utf-8'))
             if self.WelcomeDialog:
                 #We don't know what the name of the user is
