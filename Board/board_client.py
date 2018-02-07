@@ -52,7 +52,7 @@ class THSensor:
     def setHtrCtrl(self):
         i2cport = I2C(scl=Pin(self.scl), sda=Pin(self.sda), freq=self.freq)
         write(self.wrt-htr, i2cport) #Command for writing to heater
-        time.sleep(0.1)
+        time.sleep(0.1) # Hack, but important (Maybe????)!
         write(self.htr-value, i2cport) #Value to be written to heater
 
 
