@@ -241,12 +241,13 @@ class Thefish(Client):
         self.calculate_health(info_dict["temp"], info_dict["hum"])
 
     def lights_off(self):
-        # TODO send message to board to turn off lights
+        print ("CALLING LIGHTS OFF")
+        client.publish('esys/emplanted/lights', bytes("OFF", 'utf-8'))
         if DEBUG:
             self.send_msg("THE LIGHTS ARE NOW OFF")
 
     def lights_on(self):
-        # TODO send message to board to turn on lights
+        client.publish('esys/emplanted/lights', bytes("ON", 'utf-8'))
         if DEBUG:
             self.send_msg("THE LIGHTS ARE NOW ON")
 
@@ -584,9 +585,10 @@ client.connect("localhost", 1883, 60)
 
 def poll_sensors():
     #Poll every minute
-    payload = json.dumps([{"name":"Poll", "text":"gimme temp and hum"}])
-    client.publish('esys/emplanted/request', bytes(payload, 'utf-8'))
-    time.sleep(60)
+    payload = json.dumps(["temp", "hum"])
+    while (True):
+        client.publish('esys/emplanted/request', bytes(payload, 'utf-8'))
+        time.sleep(60)
 
 polling_always_on_thread = threading.Thread(target = poll_sensors)
 polling_always_on_thread.start()

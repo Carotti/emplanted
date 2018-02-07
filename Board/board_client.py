@@ -15,7 +15,8 @@ boardConfig = {
         "broker": "192.168.43.92",
         "topic": "esys/emplanted/",
         "subscriptions": [
-            "lights"
+            "lights",
+            "request"
         ]
     },
     "th-sensor": {
@@ -42,19 +43,19 @@ class THSensor:
         self.slaveAddr = config["slave-addr"]
         self.commands = config["commands"]
 
-    def rw(inAddress, outAddress):
+    def rw(self, inAddress, outAddress):
         i2cport = I2C(scl=Pin(self.scl), sda=Pin(self.sda), freq=self.freq)
         i2cport.writeto(self.slaveAddr, bytearray([inAddress]))
         time.sleep(0.1) # Hack, but important!
         data=i2cport.readfrom(outAddress, 2) # Read 2 bytes
         return data
 
-    def getTemp():
+    def getTemp(self):
         temp = int.from_bytes(self.rw(self.commands["measure-temp"], self.slaveAddr), 'big')
         temp_celsius = (175.72*temp/65536) - 46.85
         return temp_celsius
 
-    def getHum():
+    def getHum(self):
         hum = int.from_bytes(self.rw(self.commands["measure-hum"], self.slaveAddr), 'big')
         hum_perc = (125*hum/65536) - 6
         return hum_perc
@@ -77,12 +78,28 @@ class EmplantedBoard:
         elif (msg == "OFF"):
             self.lights.disable()
 
+    def mqttReceivedRequest(self, msg):
+        requests = json.loads(msg)
+        readings = []
+        for i in requests:
+            reading = None
+            if i == "temp":
+                reading = self.thSensor.getTemp()
+            elif i == "hum":
+                reading = self.thSensor.getHum()
+            payload = json.dumps({i: readings})
+            readings.append(payload)
+        self.mqttPublish("readings", readings)
+
     def mqttReceived(self, topic, msg):
         topicStr = topic.decode("utf-8")
         msgStr = msg.decode("utf-8")
 
         if topicStr == (self.mqttTopic + "lights"):
             self.mqttReceivedLights(msgStr)
+
+        if topicStr == (self.mqttTopic + "request"):
+            self.mqttReceivedRequest(msgStr)
 
     def __init__(self, config):
         ap_if = network.WLAN(network.AP_IF)
