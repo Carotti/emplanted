@@ -16,7 +16,10 @@ boardConfig = {
         "topic": "esys/emplanted/",
         "subscriptions": [
             "lights",
-            "request"
+            "request",
+            "fan",
+            "heat",
+            "hum"
         ]
     },
     "th-sensor": {
@@ -34,6 +37,18 @@ boardConfig = {
     },
     "lights": {
         "pin": 14,
+        "default-state": 0
+    },
+    "fan": {
+        "pin": 15,
+        "default-state": 0
+    },
+    "humidifer": {
+        "pin": 16,
+        "default-state": 0
+    },
+    "heater": {
+        "pin": 17,
         "default-state": 0
     }
 }
@@ -84,7 +99,40 @@ class THSensor:
         hum_perc = (125*hum/65536) - 6
         return hum_perc
 
-class Lights:
+class Light:
+    def __init__(self, config):
+        self.pin = Pin(config["pin"], Pin.OUT)
+        self.pin.value(config["default-state"])
+
+    def enable(self):
+        self.pin.value(0)
+
+    def disable(self):
+        self.pin.value(1)
+
+class Fan:
+    def __init__(self, config):
+        self.pin = Pin(config["pin"], Pin.OUT)
+        self.pin.value(config["default-state"])
+
+    def enable(self):
+        self.pin.value(0)
+
+    def disable(self):
+        self.pin.value(1)
+
+class Heater:
+    def __init__(self, config):
+        self.pin = Pin(config["pin"], Pin.OUT)
+        self.pin.value(config["default-state"])
+
+    def enable(self):
+        self.pin.value(0)
+
+    def disable(self):
+        self.pin.value(1)
+
+class Humidifer:
     def __init__(self, config):
         self.pin = Pin(config["pin"], Pin.OUT)
         self.pin.value(config["default-state"])
@@ -96,11 +144,29 @@ class Lights:
         self.pin.value(1)
 
 class EmplantedBoard:
-    def mqttReceivedLights(self, msg):
+    def mqttReceivedLight(self, msg):
         if (msg == "ON"):
             self.lights.enable()
         elif (msg == "OFF"):
             self.lights.disable()
+
+    def mqttReceivedFan(self, msg):
+        if (msg == "ON"):
+            self.fans.enable()
+        elif (msg == "OFF"):
+            self.fans.disable()
+
+    def mqttReceivedHeater(self, msg):
+        if (msg == "ON"):
+            self.heater.enable()
+        elif (msg == "OFF"):
+            self.heater.disable()
+
+    def mqttReceivedHumidifier(self, msg):
+        if (msg == "ON"):
+            self.humidifer.enable()
+        elif (msg == "OFF"):
+            self.humidifer.disable()
 
     def mqttReceivedRequest(self, msg):
         requests = json.loads(msg)
@@ -119,10 +185,19 @@ class EmplantedBoard:
         msgStr = msg.decode("utf-8")
 
         if topicStr == (self.mqttTopic + "lights"):
-            self.mqttReceivedLights(msgStr)
+            self.mqttReceivedLight(msgStr)
 
-        if topicStr == (self.mqttTopic + "request"):
+        elif topicStr == (self.mqttTopic + "request"):
             self.mqttReceivedRequest(msgStr)
+
+        elif topicStr == (self.mqttTopic + "hum"):
+            self.mqttReceivedHumidifier(msgStr)
+
+        elif topicStr == (self.mqttTopic + "fan"):
+            self.mqttReceivedFan(msgStr)
+
+        elif topicStr == (self.mqttTopic + "heat"):
+            self.mqttReceivedHeat(msgStr)
 
     def __init__(self, config):
         ap_if = network.WLAN(network.AP_IF)
@@ -145,7 +220,13 @@ class EmplantedBoard:
 
         self.thSensor = THSensor(config["th-sensor"])
 
-        self.lights = Lights(config["lights"])
+        self.lights = Light(config["lights"])
+
+        self.fans = Fan(config["fan"])
+
+        self.humidifer = Humidifer(config["humidifer"])
+
+        self.heater = Heater(config["heater"])
 
     def mqttPublish(self, topic, payload):
         self.mqttClient.publish(self.mqttTopic + topic, bytes(payload, 'utf-8'))
@@ -161,16 +242,3 @@ board = EmplantedBoard(boardConfig)
 while True:
     board.mqttCheck()
     time.sleep(1)
-
-# payload = json.dumps([
-#     {"name":"temp-reading", "data":getTemp()},
-#     {"name":"hum-reading", "data":getHum()}
-# ])
-# client.publish('esys/emplanted/temp', bytes(payload,'utf-8'))
-
-# while True:
-#     tmp = getTemp()
-#     if tmp > 23:
-#         payload = json.dumps([{"name":"warning", "text":"Temperature is above 23!"}])
-#         client.publish('esys/emplanted/warnings', bytes(payload, 'utf-8'))
-#     time.sleep(5)

@@ -56,6 +56,27 @@ client = mqtt.Client()
 
 request_payload = json.dumps(["temp", "hum"])
 
+def lower_hum():
+    client.publish('esys/emplanted/fan', bytes("ON", 'utf-8'))
+    client.publish('esys/emplanted/hum', bytes("OFF", 'utf-8'))
+    print("Lowering Humidity")
+
+def increase_hum():
+    client.publish('esys/emplanted/fan', bytes("OFF", 'utf-8'))
+    client.publish('esys/emplanted/hum', bytes("ON", 'utf-8'))
+    print("Raising Humidity")
+
+def lower_temp():
+    client.publish('esys/emplanted/fan', bytes("ON", 'utf-8'))
+    client.publish('esys/emplanted/heat', bytes("OFF", 'utf-8'))
+    print("Lowering Temperature")
+
+def increase_temp():
+    client.publish('esys/emplanted/fan', bytes("OFF", 'utf-8'))
+    client.publish('esys/emplanted/heat', bytes("ON", 'utf-8'))
+    print("Increasing Humidity")
+
+
 def send_request():
     client.publish('esys/emplanted/request', bytes(request_payload, 'utf-8'))
 
@@ -66,7 +87,7 @@ class Thefish(Client):
         self.fish_tank_thread_id = '1863119160367263'
         self.lights_off_time = None
         self.lights_on_time = None
-        self.last_hum_dev = 0;
+        self.hum_dev_history = [];
 
         # On time, off time
         self.lights_schedule = [None, None]
@@ -101,6 +122,8 @@ class Thefish(Client):
         self.display_status = False
 
         self.plant_of_interest = ""
+
+        self.send_refill_msg = True
 
         #Startup greeting
         if not DEBUG:
@@ -137,7 +160,7 @@ class Thefish(Client):
                 unhappy_plants = unhappy_plants + 1
                 new_unhappy_plants["too hot"].append(plant)
             elif curr_temp < min_temp:
-                temp_dev += temp_dev + min_temp - curr_temp
+                temp_dev = temp_dev + curr_temp - min_temp
                 unhappy_plants = unhappy_plants + 1
                 new_unhappy_plants["too cold"].append(plant)
             else:
@@ -147,7 +170,7 @@ class Thefish(Client):
                 unhappy_plants = unhappy_plants + 1
                 new_unhappy_plants["too humid"].append(plant)
             elif curr_hum < min_hum:
-                hum_dev = hum_dev + min_hum - curr_hum
+                hum_dev = hum_dev + curr_hum - min_hum
                 unhappy_plants = unhappy_plants + 1
                 new_unhappy_plants["too dry"].append(plant)
             elif happy_temp:
@@ -174,20 +197,30 @@ class Thefish(Client):
                 random_emoji_index = random.randint(0, len(emojis_dict[problem]) - 1)
                 self.send_msg("Your " + plant + " is " + problem + emojis_dict[problem][random_emoji_index])
 
+        self.hum_dev_history.append(hum_dev)
+
+        if DEBUG:
+            print(self.hum_dev_history)
+
+        if len(self.hum_dev_history) > 30:
+            self.hum_dev_history = self.hum_dev_history[1:]
         if hum_dev > 10:
-            # TODO SPRAY WATER
-            if (last_hum_dev == hum_dev){
-              # TODO Then the water is probably empty - I think we need to truncate the humidity for this.
-            }
+            lower_hum()
+            self.send_refill_msg = True
             pass
         elif hum_dev < -10:
-            # TODO TURN ON FAN
-            pass
-        elif temp_dev > 10:
-            # TODO TURN ON FAN
+            increase_hum()
+            if (self.send_refill_msg) and (len(self.hum_dev_history) >= 25) and ((sum(self.hum_dev_history)/len(self.hum_dev_history))) < -10:
+                self.send_refill_msg = False
+                self.send_msg("Please refill my water tank " + u'\U0001F6B1')
+        else:
+            self.send_refill_msg = True
+
+        if temp_dev > 10:
+            lower_temp()
             pass
         elif temp_dev < -10:
-            # TODO TURN ON HEATER
+            increase_temp()
             pass
 
         self.unhappy_plants = new_unhappy_plants
@@ -216,7 +249,7 @@ class Thefish(Client):
         self.change_color(health_bar_colors[health_level])
 
     def log_readings(self, info_dict):
-        #TODO needs to store the current reading inside the self.tank_stats
+        # needs to store the current reading inside the self.tank_stats
         # Check if it is a new day using python datetime
         # If it is a new day append the average of the tank_stats list into the daily_stats
         # tank_stats = []
@@ -260,7 +293,6 @@ class Thefish(Client):
             self.send_msg("The temperature inside the planter is " + str(info_dict["temp"]) + u'\U000000B0' + "C and the humidity is " + str(info_dict["hum"]) + "%.")
 
     def lights_off(self):
-        print ("CALLING LIGHTS OFF")
         client.publish('esys/emplanted/lights', bytes("OFF", 'utf-8'))
         if DEBUG:
             self.send_msg("THE LIGHTS ARE NOW OFF")
@@ -398,7 +430,24 @@ class Thefish(Client):
 
                 if plant_name:
                     self.get_temps(plant_name)
-
+            elif "turn" in text and ("spray " in text or "humidifier " in text):
+                if "on" in text:
+                    client.publish('esys/emplanted/hum', bytes("ON", 'utf-8'))
+                    if DEBUG:
+                        self.send_msg("Spray ON")
+                else:
+                    client.publish('esys/emplanted/hum', bytes("OFF", 'utf-8'))
+                    if DEBUG:
+                        self.send_msg("Spray OFF")
+            elif "turn" in text and ("fan " in text or "vent " in text):
+                if "on" in text:
+                    client.publish('esys/emplanted/fan', bytes("ON", 'utf-8'))
+                    if DEBUG:
+                        self.send_msg("Fan ON")
+                else:
+                    client.publish('esys/emplanted/fan', bytes("OFF", 'utf-8'))
+                    if DEBUG:
+                        self.send_msg("Fan OFF")
             elif "turn" in text and "lights" in text:
                 on = True
                 if "off" in text:
@@ -428,7 +477,7 @@ class Thefish(Client):
                 elif "every" in text or "daily" in text:
                     #turn on lights every day at 6:30
                     time_pattern = re.compile("\d+:\d+(pm)?(am)?")
-                    lazy_time_pattern = re.compile("\d+(pm)?(am)?")
+                    lazy_time_pattern = re.compile("\d+(a)?(p)?m")
                     # e.g. 7 o clock
                     lazy_time = ("clock" in text) or ((("pm" in text) or ("am" in text)) and (":" not in text))
                     start_time = None
@@ -580,10 +629,6 @@ class Thefish(Client):
                         if ("1" in s or "2" in s or "3" in s) and (("temperature" in line) or ("degrees" in line)) and len(line) > 20:
                             self.send_msg(s)
                             return
-
-    def get_disease(self, plant_name, keywords):
-        #Do some fancy regex stuff here!
-        pass
 
 
 
