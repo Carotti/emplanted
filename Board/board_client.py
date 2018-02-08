@@ -99,40 +99,7 @@ class THSensor:
         hum_perc = (125*hum/65536) - 6
         return hum_perc
 
-class Light:
-    def __init__(self, config):
-        self.pin = Pin(config["pin"], Pin.OUT)
-        self.pin.value(config["default-state"])
-
-    def enable(self):
-        self.pin.value(0)
-
-    def disable(self):
-        self.pin.value(1)
-
-class Fan:
-    def __init__(self, config):
-        self.pin = Pin(config["pin"], Pin.OUT)
-        self.pin.value(config["default-state"])
-
-    def enable(self):
-        self.pin.value(0)
-
-    def disable(self):
-        self.pin.value(1)
-
-class Heater:
-    def __init__(self, config):
-        self.pin = Pin(config["pin"], Pin.OUT)
-        self.pin.value(config["default-state"])
-
-    def enable(self):
-        self.pin.value(0)
-
-    def disable(self):
-        self.pin.value(1)
-
-class Humidifer:
+class Output:
     def __init__(self, config):
         self.pin = Pin(config["pin"], Pin.OUT)
         self.pin.value(config["default-state"])
@@ -144,29 +111,11 @@ class Humidifer:
         self.pin.value(1)
 
 class EmplantedBoard:
-    def mqttReceivedLight(self, msg):
+    def mqttReceivedOutput(self, o, msg):
         if (msg == "ON"):
-            self.lights.enable()
+            self.outputs[o].enable()
         elif (msg == "OFF"):
-            self.lights.disable()
-
-    def mqttReceivedFan(self, msg):
-        if (msg == "ON"):
-            self.fans.enable()
-        elif (msg == "OFF"):
-            self.fans.disable()
-
-    def mqttReceivedHeater(self, msg):
-        if (msg == "ON"):
-            self.heater.enable()
-        elif (msg == "OFF"):
-            self.heater.disable()
-
-    def mqttReceivedHumidifier(self, msg):
-        if (msg == "ON"):
-            self.humidifer.enable()
-        elif (msg == "OFF"):
-            self.humidifer.disable()
+            self.outputs[o].disable()
 
     def mqttReceivedRequest(self, msg):
         requests = json.loads(msg)
@@ -184,20 +133,12 @@ class EmplantedBoard:
         topicStr = topic.decode("utf-8")
         msgStr = msg.decode("utf-8")
 
-        if topicStr == (self.mqttTopic + "lights"):
-            self.mqttReceivedLight(msgStr)
-
-        elif topicStr == (self.mqttTopic + "request"):
+        if topicStr == (self.mqttTopic + "request"):
             self.mqttReceivedRequest(msgStr)
-
-        elif topicStr == (self.mqttTopic + "hum"):
-            self.mqttReceivedHumidifier(msgStr)
-
-        elif topicStr == (self.mqttTopic + "fan"):
-            self.mqttReceivedFan(msgStr)
-
-        elif topicStr == (self.mqttTopic + "heat"):
-            self.mqttReceivedHeat(msgStr)
+        else:
+            for o in outputs:
+                if topicStr == (self.mqttTopic + o):
+                    self.mqttReceivedOutput(o, msgStr)
 
     def __init__(self, config):
         ap_if = network.WLAN(network.AP_IF)
@@ -220,13 +161,12 @@ class EmplantedBoard:
 
         self.thSensor = THSensor(config["th-sensor"])
 
-        self.lights = Light(config["lights"])
-
-        self.fans = Fan(config["fan"])
-
-        self.humidifer = Humidifer(config["humidifer"])
-
-        self.heater = Heater(config["heater"])
+        self.outputs = {
+            "lights" : Output(config["lights"]),
+            "fans" : Output(config["fan"]),
+            "humidifier" : Output(config["humidifer"]),
+            "heater" : Output(config["heater"])
+        }
 
     def mqttPublish(self, topic, payload):
         self.mqttClient.publish(self.mqttTopic + topic, bytes(payload, 'utf-8'))
