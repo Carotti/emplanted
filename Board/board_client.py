@@ -40,11 +40,11 @@ boardConfig = {
         "default-state": 0
     },
     "fan": {
-        "pin": 15,
+        "pin": 13,
         "default-state": 0
     },
     "humidifer": {
-        "pin": 13,
+        "pin": 15,
         "default-state": 0
     },
     "heater": {
@@ -140,7 +140,7 @@ class EmplantedBoard:
 
         self.outputs = {
             "lights" : Output(config["lights"]),
-            "fans" : Output(config["fan"]),
+            "fan" : Output(config["fan"]),
             "hum" : Output(config["humidifer"]),
             "heat" : Output(config["heater"])
         }
