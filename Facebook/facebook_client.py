@@ -44,12 +44,6 @@ def after_sub_list_finder(big_list, sub_list):
             current_sub_list_ind = 0
         big_list_ind = big_list_ind + 1
 
-def times_match(time1, time2):
-    if (time1.hour == time2.hour) and (time1.minute == time2.minute):
-        return True
-    else:
-        return False
-
 #All the MQTT stuff - uncomment out when you have the board:
 
 client = mqtt.Client()
@@ -205,23 +199,20 @@ class Thefish(Client):
         if len(self.hum_dev_history) > 30:
             self.hum_dev_history = self.hum_dev_history[1:]
         if hum_dev > 10:
-            lower_hum()
+            # lower_hum()
             self.send_refill_msg = True
-            pass
         elif hum_dev < -10:
-            increase_hum()
+            # increase_hum()
             if (self.send_refill_msg) and (len(self.hum_dev_history) >= 25) and ((sum(self.hum_dev_history)/len(self.hum_dev_history))) < -10:
                 self.send_refill_msg = False
                 self.send_msg("Please refill my water tank " + u'\U0001F6B1')
         else:
             self.send_refill_msg = True
 
-        if temp_dev > 10:
-            lower_temp()
-            pass
-        elif temp_dev < -10:
-            increase_temp()
-            pass
+        # if temp_dev > 10:
+        #     lower_temp()
+        # elif temp_dev < -10:
+        #     increase_temp()
 
         self.unhappy_plants = new_unhappy_plants
 
@@ -259,19 +250,19 @@ class Thefish(Client):
         current_date_time = datetime.datetime.now()
 
         if self.lights_off_time:
-            if times_match(current_date_time, self.lights_off_time):
+            if current_date_time.time() == self.lights_off_time:
                 self.lights_off()
                 self.lights_off_time = None
         if self.lights_on_time:
-            if times_match(current_date_time, self.lights_on_time):
+            if current_date_time.time() == self.lights_on_time:
                 self.lights_on()
                 self.lights_on_time = None
 
         # On time, off time
         if self.lights_schedule[0]:
-            if times_match(current_date_time, self.lights_schedule[0]):
+            if current_date_time.time() == self.lights_schedule[0]:
                 self.lights_on()
-            elif times_match(current_date_time, self.lights_schedule[1]):
+            elif current_date_time.time() == self.lights_schedule[1]:
                 self.lights_off()
 
 
@@ -328,7 +319,32 @@ class Thefish(Client):
                                 + " and " + inside_tank_set[-1] + " inside the tank")
             else:
                 self.send_msg("I now know you have " + inside_tank_set[0] + " inside the tank")
+
+            max_min_temp = -100
+            max_min_hum  = 0
+            min_max_temp = 100
+            min_max_hum  = 100
+            for plant in self.inside_tank:
+                max_temp = self.plant_data[plant]["max-temp"]
+                min_temp = self.plant_data[plant]["min-temp"]
+                max_hum = self.plant_data[plant]["max-hum"]
+                min_hum = self.plant_data[plant]["min-hum"]
+                if (max_hum < min_max_hum):
+                    min_max_hum = max_hum
+                if (min_hum > max_min_hum):
+                    max_min_hum = min_hum
+                if (max_temp < min_max_temp):
+                    min_max_temp = max_temp
+                if (min_temp > max_min_temp):
+                    max_min_temp = min_temp
+            target_payload = json.dumps([(max_min_temp + min_max_temp)/2, (max_min_hum + min_max_hum)/2])
+            client.publish('esys/emplanted/target', bytes(target_payload, 'utf-8'))
+            if self.lights_schedule:
+                current_time = datetime.datetime.now().time()
+                if (current_time >= self.lights_schedule[0]) and (current_time <= self.lights_schedule[1]):
+                    self.lights_on()
         else:
+            client.publish('esys/emplanted/sleep', bytes("sleep", 'utf-8'))
             self.send_msg("Your tank is now empty!")
 
         if self.tank_stats["temp"] and self.tank_stats["hum"]:
@@ -576,8 +592,7 @@ class Thefish(Client):
                     self.acknowledge_plant()
                     self.send_msg("You can add and remove plants any time by typing 'add' or 'remove'")
                     self.WelcomeDialog = 0
-            else:
-                pass
+
     def get_description(self, plant_name):
         info_list = get_text(self.plant_data[plant_name]["url"])
         desc_ind = after_sub_list_finder(info_list, ['Description', ''])
