@@ -319,7 +319,10 @@ class Thefish(Client):
                                 + " and " + inside_tank_set[-1] + " inside the tank")
             else:
                 self.send_msg("I now know you have " + inside_tank_set[0] + " inside the tank")
+        self.send_target()
 
+    def send_target(self):
+        if (self.inside_tank):
             max_min_temp = -100
             max_min_hum  = 0
             min_max_temp = 100
@@ -453,15 +456,15 @@ class Thefish(Client):
                 if "spray" in text or "humidifier " in text:
                     if DEBUG:
                         self.send_msg("HUMIDIFER IS NOW AUTO")
-                    client.publish('esys/emplanted/hum', bytes("AUTO", 'utf-8'))
+                    self.send_target()
                 if "heat" in text:
                     if DEBUG:
                         self.send_msg("HEATER IS NOW AUTO")
-                    client.publish('esys/emplanted/heat', bytes("AUTO", 'utf-8'))
+                    self.send_target()
                 if "fan " in text or "vent " in text:
                     if DEBUG:
                         self.send_msg("FAN IS NOW AUTO")
-                    client.publish('esys/emplanted/fan', bytes("AUTO", 'utf-8'))
+                    self.send_target()
             elif "turn" in text and ("spray " in text or "humidifier " in text):
                 if "on" in text:
                     client.publish('esys/emplanted/hum', bytes("ON", 'utf-8'))
