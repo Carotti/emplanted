@@ -451,10 +451,16 @@ class Thefish(Client):
                     self.get_temps(plant_name)
             elif "auto" in text:
                 if "spray" in text or "humidifier " in text:
+                    if DEBUG:
+                        self.send_msg("HUMIDIFER IS NOW AUTO")
                     client.publish('esys/emplanted/hum', bytes("AUTO", 'utf-8'))
-                elif "heat" in text:
+                if "heat" in text:
+                    if DEBUG:
+                        self.send_msg("HEATER IS NOW AUTO")
                     client.publish('esys/emplanted/heat', bytes("AUTO", 'utf-8'))
-                elif "fan " in text or "vent " in text:
+                if "fan " in text or "vent " in text:
+                    if DEBUG:
+                        self.send_msg("FAN IS NOW AUTO")
                     client.publish('esys/emplanted/fan', bytes("AUTO", 'utf-8'))
             elif "turn" in text and ("spray " in text or "humidifier " in text):
                 if "on" in text:
