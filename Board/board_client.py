@@ -43,15 +43,15 @@ boardConfig = {
     },
     "fan": {
         "pin": 13,
-        "default-state": 0
+        "default-state": 1
     },
     "humidifer": {
         "pin": 15,
-        "default-state": 0
+        "default-state": 1
     },
     "heater": {
         "pin": 12,
-        "default-state": 0
+        "default-state": 1
     }
 }
 
@@ -131,10 +131,10 @@ class EmplantedBoard:
     def mqttReceivedOutput(self, o, msg):
         if msg == "ON":
             self.outputs[o].enable()
-            disableAuto(o)
+            self.disableAuto(o)
         elif msg == "OFF":
             self.outputs[o].disable()
-            disableAuto(o)
+            self.disableAuto(o)
 
     def mqttReceivedRequest(self, msg):
         requests = json.loads(msg)

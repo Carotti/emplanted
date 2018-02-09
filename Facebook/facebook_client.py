@@ -342,7 +342,7 @@ class Thefish(Client):
                     max_min_temp = min_temp
             target_payload = json.dumps([(max_min_temp + min_max_temp)/2, (max_min_hum + min_max_hum)/2])
             client.publish('esys/emplanted/target', bytes(target_payload, 'utf-8'))
-            if self.lights_schedule:
+            if self.lights_schedule[0] and self.lights_schedule[1]:
                 current_time = datetime.datetime.now().time()
                 if (current_time >= self.lights_schedule[0]) and (current_time <= self.lights_schedule[1]):
                     self.lights_on()
@@ -453,18 +453,9 @@ class Thefish(Client):
                 if plant_name:
                     self.get_temps(plant_name)
             elif "auto" in text:
-                if "spray" in text or "humidifier " in text:
-                    if DEBUG:
-                        self.send_msg("HUMIDIFER IS NOW AUTO")
-                    self.send_target()
-                if "heat" in text:
-                    if DEBUG:
-                        self.send_msg("HEATER IS NOW AUTO")
-                    self.send_target()
-                if "fan " in text or "vent " in text:
-                    if DEBUG:
-                        self.send_msg("FAN IS NOW AUTO")
-                    self.send_target()
+                if DEBUG:
+                    self.send_msg("BOARD IS NOW AUTO")
+                self.send_target()
             elif "turn" in text and ("spray " in text or "humidifier " in text):
                 if "on" in text:
                     client.publish('esys/emplanted/hum', bytes("ON", 'utf-8'))
