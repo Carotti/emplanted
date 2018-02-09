@@ -344,7 +344,7 @@ class Thefish(Client):
                 if (current_time >= self.lights_schedule[0]) and (current_time <= self.lights_schedule[1]):
                     self.lights_on()
         else:
-            client.publish('esys/emplanted/sleep', bytes("sleep", 'utf-8'))
+            client.publish('esys/emplanted/sleep', bytes("SLEEP", 'utf-8'))
             self.send_msg("Your tank is now empty!")
 
         if self.tank_stats["temp"] and self.tank_stats["hum"]:
