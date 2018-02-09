@@ -40,5 +40,12 @@
       "min-hum":        65,
       "max-hum":        80,
       "url":            "https://plantvillage.org/topics/strawberry/infos"
+      },
+      "mint": {
+      "min-temp":       0,
+      "max-temp":       35,
+      "min-hum":        45,
+      "max-hum":        90,
+      "url":            "https://plantvillage.org/topics/mint/infos"
       }
 }

@@ -19,7 +19,9 @@ boardConfig = {
             "request",
             "fan",
             "heat",
-            "hum"
+            "hum",
+            "target",
+            "sleep"
         ]
     },
     "th-sensor": {
@@ -88,35 +90,6 @@ class Output:
         self.pin.value(1)
 
 class EmplantedBoard:
-    def mqttReceivedOutput(self, o, msg):
-        if (msg == "ON"):
-            self.outputs[o].enable()
-        elif (msg == "OFF"):
-            self.outputs[o].disable()
-
-    def mqttReceivedRequest(self, msg):
-        requests = json.loads(msg)
-        readings = {}
-        for i in requests:
-            reading = None
-            if i == "temp":
-                reading = self.thSensor.getTemp()
-            elif i == "hum":
-                reading = self.thSensor.getHum()
-            readings[i] = reading
-        self.mqttPublish("readings", json.dumps(readings))
-
-    def mqttReceived(self, topic, msg):
-        topicStr = topic.decode("utf-8")
-        msgStr = msg.decode("utf-8")
-
-        if topicStr == (self.mqttTopic + "request"):
-            self.mqttReceivedRequest(msgStr)
-        else:
-            for o in self.outputs:
-                if topicStr == (self.mqttTopic + o):
-                    self.mqttReceivedOutput(o, msgStr)
-
     def __init__(self, config):
         ap_if = network.WLAN(network.AP_IF)
         ap_if.active(False)
@@ -138,12 +111,77 @@ class EmplantedBoard:
 
         self.thSensor = THSensor(config["th-sensor"])
 
+        # Create each of the outputs
         self.outputs = {
             "lights" : Output(config["lights"]),
             "fan" : Output(config["fan"]),
             "hum" : Output(config["humidifer"]),
             "heat" : Output(config["heater"])
         }
+
+        self.targetTemp = None
+        self.targetHum = None
+
+    # Given an output, determine if automatic mode should be disabled
+    def disableAuto(self, output):
+        if output != "lights":
+            self.targetTemp = None
+            self.targetHum = None
+
+    def mqttReceivedOutput(self, o, msg):
+        if msg == "ON":
+            self.outputs[o].enable()
+            disableAuto(o)
+        elif msg == "OFF":
+            self.outputs[o].disable()
+            disableAuto(o)
+
+    def mqttReceivedRequest(self, msg):
+        requests = json.loads(msg)
+        readings = {}
+        for i in requests:
+            reading = None
+            if i == "temp":
+                reading = self.thSensor.getTemp()
+            elif i == "hum":
+                reading = self.thSensor.getHum()
+            readings[i] = reading
+        self.mqttPublish("readings", json.dumps(readings))
+
+    def mqttSetTarget(self, msg):
+        tempHumTarget = json.loads(msg)
+        self.targetTemp = float(tempHumTarget[0])
+        self.targetHum = float(tempHumTarget[1])
+
+    def monitorEnvironment(self):
+        currentTemp = self.thSensor.getTemp()
+        currentHum = self.thSensor.getHum()
+        if (self.targetTemp != None) and (self.targetHum != None):
+            if currentTemp < self.targetTemp:
+                self.outputs["heat"].enable()
+            else:
+                self.outputs["heat"].disable()
+            if currentHum < self.targetHum:
+                self.outputs["hum"].enable()
+            else:
+                self.outputs["hum"].disable()
+            if ((currentHum - self.targetHum) + (currentTemp - self.targetTemp)) > 0:
+                self.outputs["fan"].enable()
+            else:
+                self.outputs["fan"].disable()
+
+    def mqttReceived(self, topic, msg):
+        topicStr = topic.decode("utf-8")
+        msgStr = msg.decode("utf-8")
+
+        if topicStr == (self.mqttTopic + "request"):
+            self.mqttReceivedRequest(msgStr)
+        elif topicStr == (self.mqttTopic + "target"):
+            self.mqttSetTarget(msgStr)
+        else:
+            for o in self.outputs:
+                if topicStr == (self.mqttTopic + o):
+                    self.mqttReceivedOutput(o, msgStr)
 
     def mqttPublish(self, topic, payload):
         self.mqttClient.publish(self.mqttTopic + topic, bytes(payload, 'utf-8'))
@@ -158,4 +196,5 @@ board = EmplantedBoard(boardConfig)
 
 while True:
     board.mqttCheck()
+    board.monitorEnvironment()
     time.sleep(1)
