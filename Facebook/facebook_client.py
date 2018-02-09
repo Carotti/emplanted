@@ -455,6 +455,16 @@ class Thefish(Client):
                     client.publish('esys/emplanted/hum', bytes("OFF", 'utf-8'))
                     if DEBUG:
                         self.send_msg("Spray OFF")
+            elif "turn" in text and ("heat" in text):
+                if "on" in text:
+                    client.publish('esys/emplanted/heat', bytes("ON", 'utf-8'))
+                    if DEBUG:
+                        self.send_msg("Heater ON")
+                else:
+                    client.publish('esys/emplanted/heat', bytes("OFF", 'utf-8'))
+                    if DEBUG:
+                        self.send_msg("Heater OFF")
+
             elif "turn" in text and ("fan " in text or "vent " in text):
                 if "on" in text:
                     client.publish('esys/emplanted/fan', bytes("ON", 'utf-8'))

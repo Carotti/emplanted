@@ -44,43 +44,25 @@ boardConfig = {
         "default-state": 0
     },
     "humidifer": {
-        "pin": 16,
+        "pin": 13,
         "default-state": 0
     },
     "heater": {
-        "pin": 17,
+        "pin": 12,
         "default-state": 0
     }
 }
 
 class THSensor:
     def __init__(self, config):
-        self.scl = config["scl"]
-        self.sda = config["sda"]
-        self.freq = config["freq"]
+        self.i2cport = I2C(scl=Pin(config["scl"]), sda=Pin(config["sda"]), freq=config["freq"])
         self.slaveAddr = config["slave-addr"]
         self.commands = config["commands"]
-        self.wrt-htr = config["htr-ctrl-cmd"]
-        self.htr-value = config["htr-ctrl-value"]
-        self.htr-strt = config["user-reg1"]
-        self.setHtrCtrl()
-
-    def setHtrCtrl(self):
-        i2cport = I2C(scl=Pin(self.scl), sda=Pin(self.sda), freq=self.freq)
-        write(self.wrt-htr, i2cport) # Command for writing to heater
-        time.sleep(0.1) # Hack, but important (Maybe????)!
-        write(self.htr-value, i2cport) # Value to be written to heater
-
-
-    def write(self, inAddress, i2cport):
-        i2cport.writeto(self.slaveAddr, bytearray([inAddress]))
-        pass
 
     def rw(self, inAddress, outAddress):
-        i2cport = I2C(scl=Pin(self.scl), sda=Pin(self.sda), freq=self.freq)
-        write(inAddress, i2cport)
+        self.i2cport.writeto(self.slaveAddr, bytearray([inAddress]))
         time.sleep(0.1) # Hack, but important!
-        data=i2cport.readfrom(outAddress, 2) # Read 2 bytes
+        data=self.i2cport.readfrom(outAddress, 2) # Read 2 bytes
         return data
 
     def getTemp(self):
@@ -89,16 +71,11 @@ class THSensor:
         return temp_celsius
 
     def getHum(self):
-        i2cport = I2C(scl=Pin(self.scl), sda=Pin(self.sda), freq=self.freq)
-        write(self.htr-strt, i2cport) # Command for writing to user register 1
-        write(0x4, i2cport) # Turn on heater, bit 2 of user register 1
-        time.sleep(10) # Sleep for 10 seconds to drive off condensation
-        write(self.htr-strt, i2cport) # Command for writing to user register 1
-        write(0x0, i2cport) # Turn off heater, bit 2 of user register 1
         hum = int.from_bytes(self.rw(self.commands["measure-hum"], self.slaveAddr), 'big')
         hum_perc = (125*hum/65536) - 6
         return hum_perc
 
+# ACTIVE LOW output
 class Output:
     def __init__(self, config):
         self.pin = Pin(config["pin"], Pin.OUT)
@@ -136,7 +113,7 @@ class EmplantedBoard:
         if topicStr == (self.mqttTopic + "request"):
             self.mqttReceivedRequest(msgStr)
         else:
-            for o in outputs:
+            for o in self.outputs:
                 if topicStr == (self.mqttTopic + o):
                     self.mqttReceivedOutput(o, msgStr)
 
@@ -164,8 +141,8 @@ class EmplantedBoard:
         self.outputs = {
             "lights" : Output(config["lights"]),
             "fans" : Output(config["fan"]),
-            "humidifier" : Output(config["humidifer"]),
-            "heater" : Output(config["heater"])
+            "hum" : Output(config["humidifer"]),
+            "heat" : Output(config["heater"])
         }
 
     def mqttPublish(self, topic, payload):
