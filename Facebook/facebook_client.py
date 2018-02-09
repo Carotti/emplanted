@@ -344,7 +344,10 @@ class Thefish(Client):
                 if (current_time >= self.lights_schedule[0]) and (current_time <= self.lights_schedule[1]):
                     self.lights_on()
         else:
-            client.publish('esys/emplanted/sleep', bytes("SLEEP", 'utf-8'))
+            client.publish('esys/emplanted/fan', bytes("OFF", 'utf-8'))
+            client.publish('esys/emplanted/hum', bytes("OFF", 'utf-8'))
+            client.publish('esys/emplanted/lights', bytes("OFF", 'utf-8'))
+            client.publish('esys/emplanted/heat', bytes("OFF", 'utf-8'))
             self.send_msg("Your tank is now empty!")
 
         if self.tank_stats["temp"] and self.tank_stats["hum"]:
@@ -446,6 +449,13 @@ class Thefish(Client):
 
                 if plant_name:
                     self.get_temps(plant_name)
+            elif "auto" in text:
+                if "spray" in text or "humidifier " in text:
+                    client.publish('esys/emplanted/hum', bytes("AUTO", 'utf-8'))
+                elif "heat" in text:
+                    client.publish('esys/emplanted/heat', bytes("AUTO", 'utf-8'))
+                elif "fan " in text or "vent " in text:
+                    client.publish('esys/emplanted/fan', bytes("AUTO", 'utf-8'))
             elif "turn" in text and ("spray " in text or "humidifier " in text):
                 if "on" in text:
                     client.publish('esys/emplanted/hum', bytes("ON", 'utf-8'))
