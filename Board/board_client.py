@@ -42,11 +42,11 @@ boardConfig = {
         "default-state": 0
     },
     "fan": {
-        "pin": 15,
+        "pin": 13,
         "default-state": 0
     },
     "humidifer": {
-        "pin": 13,
+        "pin": 15,
         "default-state": 0
     },
     "heater": {
@@ -111,21 +111,30 @@ class EmplantedBoard:
 
         self.thSensor = THSensor(config["th-sensor"])
 
+        # Create each of the outputs
         self.outputs = {
             "lights" : Output(config["lights"]),
-            "fans" : Output(config["fan"]),
+            "fan" : Output(config["fan"]),
             "hum" : Output(config["humidifer"]),
             "heat" : Output(config["heater"])
         }
-        self.awake = False
+
         self.targetTemp = None
         self.targetHum = None
 
+    # Given an output, determine if automatic mode should be disabled
+    def disableAuto(self, output):
+        if output != "lights":
+            self.targetTemp = None
+            self.targetHum = None
+
     def mqttReceivedOutput(self, o, msg):
-        if (msg == "ON"):
+        if msg == "ON":
             self.outputs[o].enable()
-        elif (msg == "OFF"):
+            disableAuto(o)
+        elif msg == "OFF":
             self.outputs[o].disable()
+            disableAuto(o)
 
     def mqttReceivedRequest(self, msg):
         requests = json.loads(msg)
@@ -139,13 +148,7 @@ class EmplantedBoard:
             readings[i] = reading
         self.mqttPublish("readings", json.dumps(readings))
 
-    def mqttSleep(self):
-        for o in self.outputs:
-            self.outputs[o].disable()
-        self.awake = False
-
     def mqttSetTarget(self, msg):
-        self.awake = True
         tempHumTarget = json.loads(msg)
         self.targetTemp = float(tempHumTarget[0])
         self.targetHum = float(tempHumTarget[1])
@@ -153,7 +156,7 @@ class EmplantedBoard:
     def monitorEnvironment(self):
         currentTemp = self.thSensor.getTemp()
         currentHum = self.thSensor.getHum()
-        if self.awake and ((self.targetTemp != None) and (self.targetHum != None)):
+        if (self.targetTemp != None) and (self.targetHum != None):
             if currentTemp < self.targetTemp:
                 self.outputs["heat"].enable()
             else:
@@ -175,8 +178,6 @@ class EmplantedBoard:
             self.mqttReceivedRequest(msgStr)
         elif topicStr == (self.mqttTopic + "target"):
             self.mqttSetTarget(msgStr)
-        elif topicStr == (self.mqttTopic + "sleep"):
-            self.mqttSleep()
         else:
             for o in self.outputs:
                 if topicStr == (self.mqttTopic + o):
