@@ -295,7 +295,7 @@ class Thefish(Client):
         #Acknowledge that tank plants have changed
         print("Inside tank: ")
         print(self.inside_tank)
-        self.send_msg("OK" + u'\U0001F44C')
+        self.send_msg("OK " + self.username + " " + u'\U0001F44C')
         inside_tank_set = list(set(self.inside_tank))
         if (self.inside_tank):
             #Proper good grammer
@@ -442,15 +442,22 @@ class Thefish(Client):
                     min_hum = min(self.daily_stats["hum"])
                     self.send_msg("Your daily average humidity for the last " + str(hum_no_of_days) + " days has a mean of " + str(avg_hum) + "%")
                     self.send_msg("and a maximum humidity of " + str(max_hum) + " and a minimum humidity of " + str(min_hum))
-                    plant_recommendations = []
+                    chosen_plant = None
+                    min_deviation = 1000
                     for plant_name in self.plant_data:
                         good_min_temp = (self.plant_data[plant_name]["min-temp"] < min_temp)
                         good_max_temp = (self.plant_data[plant_name]["max-temp"] > max_temp)
                         good_min_hum = (self.plant_data[plant_name]["min-hum"] < min_hum)
                         good_max_hum = (self.plant_data[plant_name]["max-hum"] > max_hum)
-                        plant_recommendations.append(plant_name)
-                    chosen_plant = plant_recommendations[random.randint(0,len(plant_recommendations) - 1)]
-                    self.send_msg("This environment is ideal for growing: " + chosen_plant)
+                        if good_max_hum and good_min_hum and good_max_temp and good_min_temp:
+                            opt_temp = (self.plant_data[plant_name]["min-temp"] + self.plant_data[plant_name]["max-temp"])/2
+                            opt_hum = (self.plant_data[plant_name]["min-hum"] + self.plant_data[plant_name]["max-hum"])/2
+                            plant_dev = abs(opt_temp - avg_temp) + abs(opt_hum - avg_hum)
+                            if plant_dev < min_deviation:
+                                min_deviation = plant_dev
+                                chosen_plant = plant_name
+                    if chosen_plant:
+                        self.send_msg(self.username + ", your smart planter is ideal for growing " + chosen_plant)
 
             elif "tell me about " in text or ("how " in text and "do" in text):
                 plant_name = ""

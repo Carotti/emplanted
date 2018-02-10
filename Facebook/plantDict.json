@@ -209,6 +209,13 @@
         "min-temp": 25,
         "url": "https://plantvillage.org/topics/cassava-manioc/infos"
     },
+    "catnip": {
+        "max-hum": 90,
+        "max-temp": 35,
+        "min-hum": 45,
+        "min-temp": -5,
+        "url": "https://plantvillage.org/topics/mint/infos"
+    },
     "cauliflower": {
         "max-hum": 90,
         "max-temp": 28,
