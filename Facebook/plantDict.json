@@ -644,9 +644,9 @@
         "url": "https://plantvillage.org/topics/mulberry/infos"
     },
     "mushrooms": {
-        "max-hum": 90,
+        "max-hum": 85,
         "max-temp": 36,
-        "min-hum": 60,
+        "min-hum": 75,
         "min-temp": 28,
         "url": "https://plantvillage.org/topics/mushrooms/infos"
     },
