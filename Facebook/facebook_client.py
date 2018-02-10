@@ -50,27 +50,6 @@ client = mqtt.Client()
 
 request_payload = json.dumps(["temp", "hum"])
 
-def lower_hum():
-    client.publish('esys/emplanted/fan', bytes("ON", 'utf-8'))
-    client.publish('esys/emplanted/hum', bytes("OFF", 'utf-8'))
-    print("Lowering Humidity")
-
-def increase_hum():
-    client.publish('esys/emplanted/fan', bytes("OFF", 'utf-8'))
-    client.publish('esys/emplanted/hum', bytes("ON", 'utf-8'))
-    print("Raising Humidity")
-
-def lower_temp():
-    client.publish('esys/emplanted/fan', bytes("ON", 'utf-8'))
-    client.publish('esys/emplanted/heat', bytes("OFF", 'utf-8'))
-    print("Lowering Temperature")
-
-def increase_temp():
-    client.publish('esys/emplanted/fan', bytes("OFF", 'utf-8'))
-    client.publish('esys/emplanted/heat', bytes("ON", 'utf-8'))
-    print("Increasing Humidity")
-
-
 def send_request():
     client.publish('esys/emplanted/request', bytes(request_payload, 'utf-8'))
 
@@ -118,6 +97,10 @@ class Thefish(Client):
         self.plant_of_interest = ""
 
         self.send_refill_msg = True
+
+        self.manual_hum = None
+
+        self.manual_temp = None
 
         #Startup greeting
         if not DEBUG:
@@ -209,11 +192,6 @@ class Thefish(Client):
         else:
             self.send_refill_msg = True
 
-        # if temp_dev > 10:
-        #     lower_temp()
-        # elif temp_dev < -10:
-        #     increase_temp()
-
         self.unhappy_plants = new_unhappy_plants
 
         self.set_color_to_plant_health(max(int(round(10 - 10*(unhappy_plants/(2*max(len(self.inside_tank), 1) ) ) ) ), 1))
@@ -282,6 +260,14 @@ class Thefish(Client):
         if self.display_status:
             self.display_status = False
             self.send_msg("The temperature inside the planter is " + str(info_dict["temp"]) + u'\U000000B0' + "C and the humidity is " + str(info_dict["hum"]) + "%.")
+            if self.manual_temp != None:
+                self.send_msg("The target temperature is manually set to " + str(self.manual_temp) + u'\U000000B0' + "C")
+            else:
+                self.send_msg("The target temperature is optimal for the plants inside the tank")
+            if self.manual_hum != None:
+                self.send_msg("The target humidity is manually set to " + str(self.manual_hum) + "%")
+            else:
+                self.send_msg("The target humidity is optimal for the plants inside the tank")
 
     def lights_off(self):
         client.publish('esys/emplanted/lights', bytes("OFF", 'utf-8'))
@@ -298,7 +284,6 @@ class Thefish(Client):
         self.lights_schedule[1] = off_t
         if (self.lights_schedule[1].hour - self.lights_schedule[0].hour < 8):
             self.send_msg("Your plants might need more than 8 hours of light! Please put me in a sunny place " + u'\U0001F60E')
-
 
     def set_delay_schedule(self, on, time):
         if on:
@@ -321,7 +306,7 @@ class Thefish(Client):
                 self.send_msg("I now know you have " + inside_tank_set[0] + " inside the tank")
         self.send_target()
 
-    def send_target(self):
+    def send_target(self, temp_override = None, hum_override = None):
         if (self.inside_tank):
             max_min_temp = -100
             max_min_hum  = 0
@@ -340,7 +325,15 @@ class Thefish(Client):
                     min_max_temp = max_temp
                 if (min_temp > max_min_temp):
                     max_min_temp = min_temp
-            target_payload = json.dumps([(max_min_temp + min_max_temp)/2, (max_min_hum + min_max_hum)/2])
+            target_temp = (max_min_temp + min_max_temp)/2
+            target_hum = (max_min_hum + min_max_hum)/2
+            if temp_override != None:
+                target_temp = temp_override
+                self.manual_temp = temp_override
+            if hum_override != None:
+                target_hum = hum_override
+                self.manual_hum = hum_override
+            target_payload = json.dumps([target_temp, target_hum])
             client.publish('esys/emplanted/target', bytes(target_payload, 'utf-8'))
             if self.lights_schedule[0] and self.lights_schedule[1]:
                 current_time = datetime.datetime.now().time()
@@ -367,12 +360,18 @@ class Thefish(Client):
         text = (message_object.text).lower()
         if "?" in text:
             text = text.replace("?", "")
+        if "%" in text:
+            text = text.replace("%", " %")
         #list of the words
         text_list = text.split(" ")
-        if "the" in text_list:
+        while "the" in text_list:
             text_list.remove("the")
-        if "of" in text_list:
+        while "of" in text_list:
             text_list.remove("of")
+        while "to" in text_list:
+            text_list.remove("to")
+
+        float_pattern = re.compile("-?\d+\.?\d*")
 
         #All the response stuff goes here
         if (thread_id == self.fish_tank_thread_id) and ((message_object.text).lower() not in self.exclude_text):
@@ -456,6 +455,14 @@ class Thefish(Client):
                 if DEBUG:
                     self.send_msg("BOARD IS NOW AUTO")
                 self.send_target()
+            elif "set" in text and "degree" in text:
+                for i in range(len(text_list[:-1])):
+                    if "degree" in text_list[i + 1] and float_pattern.match(text_list[i]):
+                        self.send_target(temp_override = float(text_list[i]), hum_override = None)
+            elif "set" in text and ("%" in text or "percent" in text):
+                for i in range(len(text_list[:-1])):
+                    if ("%" in text_list[i + 1] or "percent" in text_list[i + 1]) and float_pattern.match(text_list[i]):
+                        self.send_target(temp_override = None, hum_override = float(text_list[i]))
             elif "turn" in text and ("spray " in text or "humidifier " in text):
                 if "on" in text:
                     client.publish('esys/emplanted/hum', bytes("ON", 'utf-8'))
@@ -488,8 +495,6 @@ class Thefish(Client):
                 on = True
                 if "off" in text:
                     on = False;
-
-                float_pattern = re.compile("\d+\.?\d*")
                 time_delay_float = 0.0
                 if "in " in text:
                     #Turn lights of in 10 minutes

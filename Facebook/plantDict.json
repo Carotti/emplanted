@@ -1,51 +1,1073 @@
 {
-	"basil": {
-      "min-temp":       16,
-	"max-temp":       28,
-	"min-hum":        60,
-	"max-hum":        90,
-      "url":            "https://plantvillage.org/topics/basil/infos"
-	},
-	"coriander": {
-      "min-temp":       16,
-      "max-temp":       29,
-      "min-hum":        60,
-      "max-hum":        70,
-      "url":            "https://plantvillage.org/topics/coriander-cilantro/infos"
-	},
-	"parsley": {
-      "min-temp":       16,
-      "max-temp":       26,
-      "min-hum":        50,
-      "max-hum":        70,
-      "url":            "https://plantvillage.org/topics/parsley/infos"
-	},
-	"rosemary": {
-      "min-temp":       0,
-      "max-temp":       35,
-      "min-hum":        60,
-      "max-hum":        90,
-      "url":            "https://plantvillage.org/topics/rosemary/infos"
-	},
-	"thyme": {
-      "min-temp":       10,
-      "max-temp":       35,
-      "min-hum":        20,
-      "max-hum":        70,
-      "url":            "https://plantvillage.org/topics/thyme/infos"
-	},
-	"strawberry": {
-      "min-temp":       16,
-      "max-temp":       26,
-      "min-hum":        65,
-      "max-hum":        80,
-      "url":            "https://plantvillage.org/topics/strawberry/infos"
-      },
-      "mint": {
-      "min-temp":       0,
-      "max-temp":       35,
-      "min-hum":        45,
-      "max-hum":        90,
-      "url":            "https://plantvillage.org/topics/mint/infos"
-      }
+    "alfalfa": {
+        "max-hum": 90,
+        "max-temp": 35,
+        "min-hum": 60,
+        "min-temp": 3,
+        "url": "https://plantvillage.org/topics/alfalfa/infos"
+    },
+    "almond": {
+        "max-hum": 90,
+        "max-temp": 30,
+        "min-hum": 60,
+        "min-temp": 15,
+        "url": "https://plantvillage.org/topics/almond/infos"
+    },
+    "amaranth": {
+        "max-hum": 90,
+        "max-temp": 28,
+        "min-hum": 60,
+        "min-temp": 16,
+        "url": "https://plantvillage.org/topics/amaranth/infos"
+    },
+    "anise": {
+        "max-hum": 90,
+        "max-temp": 24,
+        "min-hum": 60,
+        "min-temp": 6,
+        "url": "https://plantvillage.org/topics/anise/infos"
+    },
+    "apple": {
+        "max-hum": 90,
+        "max-temp": 28,
+        "min-hum": 60,
+        "min-temp": 16,
+        "url": "https://plantvillage.org/topics/apple/infos"
+    },
+    "apricot": {
+        "max-hum": 90,
+        "max-temp": 28,
+        "min-hum": 60,
+        "min-temp": 16,
+        "url": "https://plantvillage.org/topics/apricot/infos"
+    },
+    "artichoke": {
+        "max-hum": 90,
+        "max-temp": 8.0,
+        "min-hum": 60,
+        "min-temp": 6.0,
+        "url": "https://plantvillage.org/topics/artichoke/infos"
+    },
+    "arugula": {
+        "max-hum": 90,
+        "max-temp": 25,
+        "min-hum": 60,
+        "min-temp": 4,
+        "url": "https://plantvillage.org/topics/arugula/infos"
+    },
+    "asparagus": {
+        "max-hum": 90,
+        "max-temp": 28,
+        "min-hum": 60,
+        "min-temp": 16,
+        "url": "https://plantvillage.org/topics/asparagus/infos"
+    },
+    "avocado": {
+        "max-hum": 90,
+        "max-temp": 33,
+        "min-hum": 60,
+        "min-temp": 25,
+        "url": "https://plantvillage.org/topics/avocado/infos"
+    },
+    "azolla": {
+        "max-hum": 90,
+        "max-temp": 12,
+        "min-hum": 60,
+        "min-temp": 5,
+        "url": "https://plantvillage.org/topics/azolla/infos"
+    },
+    "banana": {
+        "max-hum": 90,
+        "max-temp": 28,
+        "min-hum": 60,
+        "min-temp": 16,
+        "url": "https://plantvillage.org/topics/banana/infos"
+    },
+    "barley": {
+        "max-hum": 90,
+        "max-temp": 28,
+        "min-hum": 60,
+        "min-temp": 16,
+        "url": "https://plantvillage.org/topics/barley/infos"
+    },
+    "basil": {
+        "max-hum": 90,
+        "max-temp": 10,
+        "min-hum": 60,
+        "min-temp": 21,
+        "url": "https://plantvillage.org/topics/basil/infos"
+    },
+    "bean": {
+        "max-hum": 90,
+        "max-temp": 28,
+        "min-hum": 60,
+        "min-temp": 16,
+        "url": "https://plantvillage.org/topics/bean/infos"
+    },
+    "beans": {
+        "max-hum": 90,
+        "max-temp": 28,
+        "min-hum": 60,
+        "min-temp": 16,
+        "url": "https://plantvillage.org/topics/bean/infos"
+    },
+    "beet": {
+        "max-hum": 90,
+        "max-temp": 18.3,
+        "min-hum": 60,
+        "min-temp": 15.5,
+        "url": "https://plantvillage.org/topics/beet/infos"
+    },
+    "bergamot": {
+        "max-hum": 90,
+        "max-temp": 37.8,
+        "min-hum": 60,
+        "min-temp": 12.8,
+        "url": "https://plantvillage.org/topics/bergamot/infos"
+    },
+    "blackberries": {
+        "max-hum": 90,
+        "max-temp": 25,
+        "min-hum": 60,
+        "min-temp": 20,
+        "url": "https://plantvillage.org/topics/blackberry/infos"
+    },
+    "blackberry": {
+        "max-hum": 90,
+        "max-temp": 25,
+        "min-hum": 60,
+        "min-temp": 20,
+        "url": "https://plantvillage.org/topics/blackberry/infos"
+    },
+    "blueberries": {
+        "max-hum": 90,
+        "max-temp": 28,
+        "min-hum": 60,
+        "min-temp": 16,
+        "url": "https://plantvillage.org/topics/blueberry/infos"
+    },
+    "blueberry": {
+        "max-hum": 90,
+        "max-temp": 28,
+        "min-hum": 60,
+        "min-temp": 16,
+        "url": "https://plantvillage.org/topics/blueberry/infos"
+    },
+    "broccoli": {
+        "max-hum": 90,
+        "max-temp": 1,
+        "min-hum": 60,
+        "min-temp": 15.5,
+        "url": "https://plantvillage.org/topics/broccoli/infos"
+    },
+    "buckwheat": {
+        "max-hum": 90,
+        "max-temp": 25,
+        "min-hum": 60,
+        "min-temp": 15,
+        "url": "https://plantvillage.org/topics/buckwheat/infos"
+    },
+    "cabbage": {
+        "max-hum": 90,
+        "max-temp": 21,
+        "min-hum": 60,
+        "min-temp": 4,
+        "url": "https://plantvillage.org/topics/cabbage-red-white-savoy/infos"
+    },
+    "cantaloupe": {
+        "max-hum": 90,
+        "max-temp": 28,
+        "min-hum": 60,
+        "min-temp": 18,
+        "url": "https://plantvillage.org/topics/cantaloupe/infos"
+    },
+    "cardamom": {
+        "max-hum": 90,
+        "max-temp": 17,
+        "min-hum": 60,
+        "min-temp": 22,
+        "url": "https://plantvillage.org/topics/cardamom/infos"
+    },
+    "carrot": {
+        "max-hum": 90,
+        "max-temp": 7.0,
+        "min-hum": 60,
+        "min-temp": 5.5,
+        "url": "https://plantvillage.org/topics/carrot/infos"
+    },
+    "cassava": {
+        "max-hum": 90,
+        "max-temp": 32,
+        "min-hum": 60,
+        "min-temp": 25,
+        "url": "https://plantvillage.org/topics/cassava-manioc/infos"
+    },
+    "cauliflower": {
+        "max-hum": 90,
+        "max-temp": 28,
+        "min-hum": 60,
+        "min-temp": 16,
+        "url": "https://plantvillage.org/topics/cauliflower/infos"
+    },
+    "celery": {
+        "max-hum": 90,
+        "max-temp": 6.8,
+        "min-hum": 60,
+        "min-temp": 6.0,
+        "url": "https://plantvillage.org/topics/celery/infos"
+    },
+    "chard": {
+        "max-hum": 90,
+        "max-temp": 18.3,
+        "min-hum": 60,
+        "min-temp": 15.5,
+        "url": "https://plantvillage.org/topics/chard/infos"
+    },
+    "cherries": {
+        "max-hum": 90,
+        "max-temp": 28,
+        "min-hum": 60,
+        "min-temp": 16,
+        "url": "https://plantvillage.org/topics/cherry-including-sour/infos"
+    },
+    "cherry": {
+        "max-hum": 90,
+        "max-temp": 28,
+        "min-hum": 60,
+        "min-temp": 16,
+        "url": "https://plantvillage.org/topics/cherry-including-sour/infos"
+    },
+    "chestnut": {
+        "max-hum": 90,
+        "max-temp": 28,
+        "min-hum": 60,
+        "min-temp": 16,
+        "url": "https://plantvillage.org/topics/chestnut/infos"
+    },
+    "chickpea": {
+        "max-hum": 90,
+        "max-temp": 28,
+        "min-hum": 60,
+        "min-temp": 16,
+        "url": "https://plantvillage.org/topics/chickpea-gram-pea/infos"
+    },
+    "chicory": {
+        "max-hum": 90,
+        "max-temp": 7.2,
+        "min-hum": 60,
+        "min-temp": 6.5,
+        "url": "https://plantvillage.org/topics/chicory/infos"
+    },
+    "chilli": {
+        "max-hum": 90,
+        "max-temp": 30,
+        "min-hum": 60,
+        "min-temp": 18,
+        "url": "https://plantvillage.org/topics/chilli-pepper/infos"
+    },
+    "chillies": {
+        "max-hum": 90,
+        "max-temp": 30,
+        "min-hum": 60,
+        "min-temp": 18,
+        "url": "https://plantvillage.org/topics/chilli-pepper/infos"
+    },
+    "chives": {
+        "max-hum": 90,
+        "max-temp": 28,
+        "min-hum": 60,
+        "min-temp": 16,
+        "url": "https://plantvillage.org/topics/chives/infos"
+    },
+    "cinnamon": {
+        "max-hum": 90,
+        "max-temp": 28,
+        "min-hum": 60,
+        "min-temp": 16,
+        "url": "https://plantvillage.org/topics/cinnamon/infos"
+    },
+    "clove": {
+        "max-hum": 90,
+        "max-temp": 27,
+        "min-hum": 60,
+        "min-temp": 16,
+        "url": "https://plantvillage.org/topics/clove/infos"
+    },
+    "clover": {
+        "max-hum": 90,
+        "max-temp": 28,
+        "min-hum": 60,
+        "min-temp": 16,
+        "url": "https://plantvillage.org/topics/clover/infos"
+    },
+    "cocoa": {
+        "max-hum": 90,
+        "max-temp": 32,
+        "min-hum": 60,
+        "min-temp": 18,
+        "url": "https://plantvillage.org/topics/cocoa-cacao/infos"
+    },
+    "coconut": {
+        "max-hum": 90,
+        "max-temp": 35,
+        "min-hum": 60,
+        "min-temp": 23,
+        "url": "https://plantvillage.org/topics/coconut/infos"
+    },
+    "cocoyam": {
+        "max-hum": 90,
+        "max-temp": 7.5,
+        "min-hum": 60,
+        "min-temp": 4.2,
+        "url": "https://plantvillage.org/topics/cocoyam/infos"
+    },
+    "coffee": {
+        "max-hum": 90,
+        "max-temp": 26,
+        "min-hum": 60,
+        "min-temp": 18,
+        "url": "https://plantvillage.org/topics/coffee/infos"
+    },
+    "coriander": {
+        "max-hum": 70,
+        "max-temp": 27,
+        "min-hum": 60,
+        "min-temp": 17,
+        "url": "https://plantvillage.org/topics/coriander-cilantro/infos"
+    },
+    "corn": {
+        "max-hum": 90,
+        "max-temp": 28,
+        "min-hum": 60,
+        "min-temp": 16,
+        "url": "https://plantvillage.org/topics/corn-maize/infos"
+    },
+    "cotton": {
+        "max-hum": 90,
+        "max-temp": 24,
+        "min-hum": 60,
+        "min-temp": 34,
+        "url": "https://plantvillage.org/topics/cotton/infos"
+    },
+    "cowpea": {
+        "max-hum": 90,
+        "max-temp": 30,
+        "min-hum": 60,
+        "min-temp": 18.3,
+        "url": "https://plantvillage.org/topics/cowpea/infos"
+    },
+    "cranberries": {
+        "max-hum": 90,
+        "max-temp": 28,
+        "min-hum": 60,
+        "min-temp": 16,
+        "url": "https://plantvillage.org/topics/cranberry/infos"
+    },
+    "cranberry": {
+        "max-hum": 90,
+        "max-temp": 28,
+        "min-hum": 60,
+        "min-temp": 16,
+        "url": "https://plantvillage.org/topics/cranberry/infos"
+    },
+    "cress": {
+        "max-hum": 90,
+        "max-temp": 6.7,
+        "min-hum": 60,
+        "min-temp": 6.0,
+        "url": "https://plantvillage.org/topics/cress/infos"
+    },
+    "cucumber": {
+        "max-hum": 90,
+        "max-temp": 35,
+        "min-hum": 60,
+        "min-temp": 25,
+        "url": "https://plantvillage.org/topics/cucumber/infos"
+    },
+    "dates": {
+        "max-hum": 90,
+        "max-temp": 27,
+        "min-hum": 60,
+        "min-temp": 12,
+        "url": "https://plantvillage.org/topics/dates/infos"
+    },
+    "dill": {
+        "max-hum": 90,
+        "max-temp": 18,
+        "min-hum": 60,
+        "min-temp": 16,
+        "url": "https://plantvillage.org/topics/dill/infos"
+    },
+    "eggplant": {
+        "max-hum": 90,
+        "max-temp": 32,
+        "min-hum": 60,
+        "min-temp": 26,
+        "url": "https://plantvillage.org/topics/eggplant/infos"
+    },
+    "endive": {
+        "max-hum": 90,
+        "max-temp": 28,
+        "min-hum": 60,
+        "min-temp": 16,
+        "url": "https://plantvillage.org/topics/endive/infos"
+    },
+    "fennel": {
+        "max-hum": 90,
+        "max-temp": 24,
+        "min-hum": 60,
+        "min-temp": 21,
+        "url": "https://plantvillage.org/topics/fennel/infos"
+    },
+    "fenugreek": {
+        "max-hum": 90,
+        "max-temp": 35,
+        "min-hum": 60,
+        "min-temp": 3,
+        "url": "https://plantvillage.org/topics/fenugreek/infos"
+    },
+    "fig": {
+        "max-hum": 90,
+        "max-temp": 30.2,
+        "min-hum": 60,
+        "min-temp": -1,
+        "url": "https://plantvillage.org/topics/fig/infos"
+    },
+    "fonio": {
+        "max-hum": 90,
+        "max-temp": 30,
+        "min-hum": 60,
+        "min-temp": 25,
+        "url": "https://plantvillage.org/topics/fonio/infos"
+    },
+    "garlic": {
+        "max-hum": 90,
+        "max-temp": 7.0,
+        "min-hum": 60,
+        "min-temp": 6.0,
+        "url": "https://plantvillage.org/topics/garlic/infos"
+    },
+    "ginger": {
+        "max-hum": 90,
+        "max-temp": 40,
+        "min-hum": 60,
+        "min-temp": 15.5,
+        "url": "https://plantvillage.org/topics/ginger/infos"
+    },
+    "gooseberries": {
+        "max-hum": 90,
+        "max-temp": 7.2,
+        "min-hum": 60,
+        "min-temp": 1.7,
+        "url": "https://plantvillage.org/topics/gooseberry/infos"
+    },
+    "gooseberry": {
+        "max-hum": 90,
+        "max-temp": 7.2,
+        "min-hum": 60,
+        "min-temp": 1.7,
+        "url": "https://plantvillage.org/topics/gooseberry/infos"
+    },
+    "gourd": {
+        "max-hum": 90,
+        "max-temp": 25,
+        "min-hum": 60,
+        "min-temp": 18,
+        "url": "https://plantvillage.org/topics/gourd/infos"
+    },
+    "grape": {
+        "max-hum": 90,
+        "max-temp": 28,
+        "min-hum": 60,
+        "min-temp": 16,
+        "url": "https://plantvillage.org/topics/grape/infos"
+    },
+    "grapefruit": {
+        "max-hum": 90,
+        "max-temp": 40,
+        "min-hum": 60,
+        "min-temp": 25,
+        "url": "https://plantvillage.org/topics/grapefruit/infos"
+    },
+    "guava": {
+        "max-hum": 90,
+        "max-temp": 45,
+        "min-hum": 60,
+        "min-temp": 15,
+        "url": "https://plantvillage.org/topics/guava/infos"
+    },
+    "hazelnut": {
+        "max-hum": 90,
+        "max-temp": 35,
+        "min-hum": 60,
+        "min-temp": 0,
+        "url": "https://plantvillage.org/topics/hazelnut-filbert/infos"
+    },
+    "hop": {
+        "max-hum": 90,
+        "max-temp": 7.5,
+        "min-hum": 60,
+        "min-temp": 6.0,
+        "url": "https://plantvillage.org/topics/hop/infos"
+    },
+    "horseradish": {
+        "max-hum": 90,
+        "max-temp": 28,
+        "min-hum": 60,
+        "min-temp": 15.5,
+        "url": "https://plantvillage.org/topics/horseradish/infos"
+    },
+    "kale": {
+        "max-hum": 90,
+        "max-temp": 21,
+        "min-hum": 60,
+        "min-temp": 4,
+        "url": "https://plantvillage.org/topics/kale/infos"
+    },
+    "kiwi": {
+        "max-hum": 90,
+        "max-temp": 9,
+        "min-hum": 60,
+        "min-temp": 8,
+        "url": "https://plantvillage.org/topics/kiwi/infos"
+    },
+    "kohlrabi": {
+        "max-hum": 90,
+        "max-temp": 24,
+        "min-hum": 60,
+        "min-temp": 7,
+        "url": "https://plantvillage.org/topics/kohlrabi/infos"
+    },
+    "lavender": {
+        "max-hum": 90,
+        "max-temp": 21,
+        "min-hum": 60,
+        "min-temp": 7,
+        "url": "https://plantvillage.org/topics/lavender/infos"
+    },
+    "leek": {
+        "max-hum": 90,
+        "max-temp": 7.0,
+        "min-hum": 60,
+        "min-temp": 5.5,
+        "url": "https://plantvillage.org/topics/leek/infos"
+    },
+    "lemon": {
+        "max-hum": 90,
+        "max-temp": 28,
+        "min-hum": 60,
+        "min-temp": 26,
+        "url": "https://plantvillage.org/topics/lemon/infos"
+    },
+    "lentil": {
+        "max-hum": 90,
+        "max-temp": 8.2,
+        "min-hum": 60,
+        "min-temp": 4.5,
+        "url": "https://plantvillage.org/topics/lentil/infos"
+    },
+    "lettuce": {
+        "max-hum": 90,
+        "max-temp": 20,
+        "min-hum": 60,
+        "min-temp": 15,
+        "url": "https://plantvillage.org/topics/lettuce/infos"
+    },
+    "lime": {
+        "max-hum": 90,
+        "max-temp": 30,
+        "min-hum": 60,
+        "min-temp": 25,
+        "url": "https://plantvillage.org/topics/lime-sour/infos"
+    },
+    "macadamia": {
+        "max-hum": 90,
+        "max-temp": 25,
+        "min-hum": 60,
+        "min-temp": 20,
+        "url": "https://plantvillage.org/topics/macadamia/infos"
+    },
+    "maize": {
+        "max-hum": 90,
+        "max-temp": 28,
+        "min-hum": 60,
+        "min-temp": 16,
+        "url": "https://plantvillage.org/topics/corn-maize/infos"
+    },
+    "mandarin": {
+        "max-hum": 90,
+        "max-temp": 37.8,
+        "min-hum": 60,
+        "min-temp": 12.8,
+        "url": "https://plantvillage.org/topics/mandarin-oranges/infos"
+    },
+    "mango": {
+        "max-hum": 90,
+        "max-temp": 8,
+        "min-hum": 60,
+        "min-temp": 30,
+        "url": "https://plantvillage.org/topics/mango/infos"
+    },
+    "marjoram": {
+        "max-hum": 90,
+        "max-temp": 35,
+        "min-hum": 60,
+        "min-temp": 15,
+        "url": "https://plantvillage.org/topics/marjoram/infos"
+    },
+    "mint": {
+        "max-hum": 90,
+        "max-temp": 35,
+        "min-hum": 45,
+        "min-temp": -5,
+        "url": "https://plantvillage.org/topics/mint/infos"
+    },
+    "molokhia": {
+        "max-hum": 90,
+        "max-temp": 28,
+        "min-hum": 60,
+        "min-temp": 16,
+        "url": "https://plantvillage.org/topics/molokhia-mallow/infos"
+    },
+    "mulberries": {
+        "max-hum": 90,
+        "max-temp": 6.5,
+        "min-hum": 60,
+        "min-temp": 5.5,
+        "url": "https://plantvillage.org/topics/mulberry/infos"
+    },
+    "mulberry": {
+        "max-hum": 90,
+        "max-temp": 30,
+        "min-hum": 60,
+        "min-temp": -32,
+        "url": "https://plantvillage.org/topics/mulberry/infos"
+    },
+    "mushrooms": {
+        "max-hum": 90,
+        "max-temp": 36,
+        "min-hum": 60,
+        "min-temp": 28,
+        "url": "https://plantvillage.org/topics/mushrooms/infos"
+    },
+    "mustard": {
+        "max-hum": 90,
+        "max-temp": 15,
+        "min-hum": 60,
+        "min-temp": 4.4,
+        "url": "https://plantvillage.org/topics/mustard/infos"
+    },
+    "napier": {
+        "max-hum": 90,
+        "max-temp": 28,
+        "min-hum": 60,
+        "min-temp": 16,
+        "url": "https://plantvillage.org/topics/napier-grass/infos"
+    },
+    "nutmeg": {
+        "max-hum": 90,
+        "max-temp": 30,
+        "min-hum": 60,
+        "min-temp": 20,
+        "url": "https://plantvillage.org/topics/nutmeg/infos"
+    },
+    "oats": {
+        "max-hum": 90,
+        "max-temp": 21,
+        "min-hum": 60,
+        "min-temp": 20,
+        "url": "https://plantvillage.org/topics/oats/infos"
+    },
+    "okra": {
+        "max-hum": 90,
+        "max-temp": 6.8,
+        "min-hum": 60,
+        "min-temp": 5.8,
+        "url": "https://plantvillage.org/topics/okra/infos"
+    },
+    "onion": {
+        "max-hum": 90,
+        "max-temp": 24,
+        "min-hum": 60,
+        "min-temp": 12,
+        "url": "https://plantvillage.org/topics/onion/infos"
+    },
+    "orange": {
+        "max-hum": 90,
+        "max-temp": 37.8,
+        "min-hum": 60,
+        "min-temp": 12.8,
+        "url": "https://plantvillage.org/topics/orange/infos"
+    },
+    "oregano": {
+        "max-hum": 90,
+        "max-temp": 35,
+        "min-hum": 60,
+        "min-temp": 15,
+        "url": "https://plantvillage.org/topics/oregano/infos"
+    },
+    "papaya": {
+        "max-hum": 90,
+        "max-temp": 33,
+        "min-hum": 60,
+        "min-temp": 21,
+        "url": "https://plantvillage.org/topics/papaya-pawpaw/infos"
+    },
+    "parsley": {
+        "max-hum": 70,
+        "max-temp": 16,
+        "min-hum": 50,
+        "min-temp": 7,
+        "url": "https://plantvillage.org/topics/parsley/infos"
+    },
+    "parsnip": {
+        "max-hum": 90,
+        "max-temp": 7.5,
+        "min-hum": 60,
+        "min-temp": 5.8,
+        "url": "https://plantvillage.org/topics/parsnip/infos"
+    },
+    "pea": {
+        "max-hum": 90,
+        "max-temp": 24,
+        "min-hum": 60,
+        "min-temp": 15,
+        "url": "https://plantvillage.org/topics/pea/infos"
+    },
+    "peach": {
+        "max-hum": 90,
+        "max-temp": 30,
+        "min-hum": 60,
+        "min-temp": 20,
+        "url": "https://plantvillage.org/topics/peach/infos"
+    },
+    "peanut": {
+        "max-hum": 90,
+        "max-temp": 34,
+        "min-hum": 60,
+        "min-temp": 30,
+        "url": "https://plantvillage.org/topics/peanut-groundnut/infos"
+    },
+    "pear": {
+        "max-hum": 90,
+        "max-temp": 45,
+        "min-hum": 60,
+        "min-temp": -26,
+        "url": "https://plantvillage.org/topics/pear/infos"
+    },
+    "pecan": {
+        "max-hum": 90,
+        "max-temp": 5,
+        "min-hum": 60,
+        "min-temp": 2,
+        "url": "https://plantvillage.org/topics/pecan/infos"
+    },
+    "pepper": {
+        "max-hum": 90,
+        "max-temp": 30,
+        "min-hum": 60,
+        "min-temp": 18,
+        "url": "https://plantvillage.org/topics/pepper-bell/infos"
+    },
+    "pineapple": {
+        "max-hum": 90,
+        "max-temp": 32,
+        "min-hum": 60,
+        "min-temp": 23,
+        "url": "https://plantvillage.org/topics/pineapple/infos"
+    },
+    "pistachio": {
+        "max-hum": 90,
+        "max-temp": 20,
+        "min-hum": 60,
+        "min-temp": -20,
+        "url": "https://plantvillage.org/topics/pistachio/infos"
+    },
+    "plantain": {
+        "max-hum": 90,
+        "max-temp": 28,
+        "min-hum": 60,
+        "min-temp": 16,
+        "url": "https://plantvillage.org/topics/plantain/infos"
+    },
+    "plum": {
+        "max-hum": 90,
+        "max-temp": 30,
+        "min-hum": 60,
+        "min-temp": 20,
+        "url": "https://plantvillage.org/topics/plum-and-prune/infos"
+    },
+    "pomegranate": {
+        "max-hum": 90,
+        "max-temp": 14,
+        "min-hum": 60,
+        "min-temp": -10,
+        "url": "https://plantvillage.org/topics/pomegranate/infos"
+    },
+    "potato": {
+        "max-hum": 90,
+        "max-temp": 27,
+        "min-hum": 60,
+        "min-temp": 12,
+        "url": "https://plantvillage.org/topics/potato/infos"
+    },
+    "potatoes": {
+        "max-hum": 90,
+        "max-temp": 27,
+        "min-hum": 60,
+        "min-temp": 12,
+        "url": "https://plantvillage.org/topics/potato/infos"
+    },
+    "prune": {
+        "max-hum": 90,
+        "max-temp": 30,
+        "min-hum": 60,
+        "min-temp": 20,
+        "url": "https://plantvillage.org/topics/plum-and-prune/infos"
+    },
+    "prunes": {
+        "max-hum": 90,
+        "max-temp": 30,
+        "min-hum": 60,
+        "min-temp": 20,
+        "url": "https://plantvillage.org/topics/plum-and-prune/infos"
+    },
+    "pumpkin": {
+        "max-hum": 90,
+        "max-temp": 25,
+        "min-hum": 60,
+        "min-temp": 18,
+        "url": "https://plantvillage.org/topics/pumpkin/infos"
+    },
+    "quince": {
+        "max-hum": 90,
+        "max-temp": 25,
+        "min-hum": 60,
+        "min-temp": 10,
+        "url": "https://plantvillage.org/topics/quince/infos"
+    },
+    "radish": {
+        "max-hum": 90,
+        "max-temp": 18,
+        "min-hum": 60,
+        "min-temp": 10,
+        "url": "https://plantvillage.org/topics/radish/infos"
+    },
+    "rapeseed": {
+        "max-hum": 90,
+        "max-temp": 10,
+        "min-hum": 60,
+        "min-temp": 2,
+        "url": "https://plantvillage.org/topics/rapeseed-colza/infos"
+    },
+    "raspberries": {
+        "max-hum": 90,
+        "max-temp": 3,
+        "min-hum": 60,
+        "min-temp": 22,
+        "url": "https://plantvillage.org/topics/raspberry/infos"
+    },
+    "raspberry": {
+        "max-hum": 90,
+        "max-temp": 30,
+        "min-hum": 60,
+        "min-temp": 22,
+        "url": "https://plantvillage.org/topics/raspberry/infos"
+    },
+    "rhubarb": {
+        "max-hum": 90,
+        "max-temp": 40,
+        "min-hum": 60,
+        "min-temp": 4.4,
+        "url": "https://plantvillage.org/topics/rhubarb/infos"
+    },
+    "rice": {
+        "max-hum": 90,
+        "max-temp": 28,
+        "min-hum": 60,
+        "min-temp": 16,
+        "url": "https://plantvillage.org/topics/rice/infos"
+    },
+    "rosemary": {
+        "max-hum": 90,
+        "max-temp": 24,
+        "min-hum": 60,
+        "min-temp": 6,
+        "url": "https://plantvillage.org/topics/rosemary/infos"
+    },
+    "rutabaga": {
+        "max-hum": 90,
+        "max-temp": 7.0,
+        "min-hum": 60,
+        "min-temp": 6.0,
+        "url": "https://plantvillage.org/topics/rutabaga/infos"
+    },
+    "rye": {
+        "max-hum": 90,
+        "max-temp": 20,
+        "min-hum": 60,
+        "min-temp": 4,
+        "url": "https://plantvillage.org/topics/rye/infos"
+    },
+    "sage": {
+        "max-hum": 90,
+        "max-temp": 7.0,
+        "min-hum": 60,
+        "min-temp": 6.5,
+        "url": "https://plantvillage.org/topics/sage/infos"
+    },
+    "sorghum": {
+        "max-hum": 90,
+        "max-temp": 35,
+        "min-hum": 60,
+        "min-temp": 18.3,
+        "url": "https://plantvillage.org/topics/sorghum/infos"
+    },
+    "soybean": {
+        "max-hum": 90,
+        "max-temp": 27,
+        "min-hum": 60,
+        "min-temp": 15,
+        "url": "https://plantvillage.org/topics/soybean/infos"
+    },
+    "spinach": {
+        "max-hum": 90,
+        "max-temp": 16,
+        "min-hum": 60,
+        "min-temp": 4,
+        "url": "https://plantvillage.org/topics/spinach/infos"
+    },
+    "sprouts": {
+        "max-hum": 90,
+        "max-temp": 24,
+        "min-hum": 60,
+        "min-temp": 7,
+        "url": "https://plantvillage.org/topics/brussels-sprouts/infos"
+    },
+    "squash": {
+        "max-hum": 90,
+        "max-temp": 25,
+        "min-hum": 60,
+        "min-temp": 18,
+        "url": "https://plantvillage.org/topics/squash/infos"
+    },
+    "starfruit": {
+        "max-hum": 80,
+        "max-temp": 35,
+        "min-hum": 65,
+        "min-temp": 20,
+        "url": "https://plantvillage.org/topics/starfruit-carambola/infos"
+    },
+    "strawberries": {
+        "max-hum": 80,
+        "max-temp": 26,
+        "min-hum": 65,
+        "min-temp": 16,
+        "url": "https://plantvillage.org/topics/strawberry/infos"
+    },
+    "strawberry": {
+        "max-hum": 90,
+        "max-temp": 28,
+        "min-hum": 60,
+        "min-temp": 16,
+        "url": "https://plantvillage.org/topics/strawberry/infos"
+    },
+    "sugarcane": {
+        "max-hum": 90,
+        "max-temp": 33,
+        "min-hum": 60,
+        "min-temp": 26,
+        "url": "https://plantvillage.org/topics/sugarcane/infos"
+    },
+    "sunflower": {
+        "max-hum": 90,
+        "max-temp": 25.5,
+        "min-hum": 60,
+        "min-temp": 21,
+        "url": "https://plantvillage.org/topics/sunflower/infos"
+    },
+    "tarragon": {
+        "max-hum": 90,
+        "max-temp": 28,
+        "min-hum": 60,
+        "min-temp": 16,
+        "url": "https://plantvillage.org/topics/tarragon/infos"
+    },
+    "tea": {
+        "max-hum": 90,
+        "max-temp": 27,
+        "min-hum": 60,
+        "min-temp": 14,
+        "url": "https://plantvillage.org/topics/tea/infos"
+    },
+    "teff": {
+        "max-hum": 90,
+        "max-temp": 27,
+        "min-hum": 60,
+        "min-temp": 10,
+        "url": "https://plantvillage.org/topics/teff/infos"
+    },
+    "thyme": {
+        "max-hum": 70,
+        "max-temp": 28,
+        "min-hum": 20,
+        "min-temp": 4,
+        "url": "https://plantvillage.org/topics/thyme/infos"
+    },
+    "tobacco": {
+        "max-hum": 90,
+        "max-temp": 30,
+        "min-hum": 60,
+        "min-temp": 20,
+        "url": "https://plantvillage.org/topics/tobacco/infos"
+    },
+    "tomato": {
+        "max-hum": 90,
+        "max-temp": 24,
+        "min-hum": 60,
+        "min-temp": 21,
+        "url": "https://plantvillage.org/topics/tomato/infos"
+    },
+    "turnip": {
+        "max-hum": 90,
+        "max-temp": 18,
+        "min-hum": 60,
+        "min-temp": 10,
+        "url": "https://plantvillage.org/topics/turnip/infos"
+    },
+    "vanilla": {
+        "max-hum": 90,
+        "max-temp": 32,
+        "min-hum": 60,
+        "min-temp": 21,
+        "url": "https://plantvillage.org/topics/vanilla/infos"
+    },
+    "walnut": {
+        "max-hum": 90,
+        "max-temp": 28,
+        "min-hum": 60,
+        "min-temp": 16,
+        "url": "https://plantvillage.org/topics/walnut/infos"
+    },
+    "watermelon": {
+        "max-hum": 90,
+        "max-temp": 28,
+        "min-hum": 60,
+        "min-temp": 18,
+        "url": "https://plantvillage.org/topics/watermelon/infos"
+    },
+    "wheat": {
+        "max-hum": 90,
+        "max-temp": 28,
+        "min-hum": 60,
+        "min-temp": 16,
+        "url": "https://plantvillage.org/topics/wheat/infos"
+    },
+    "yams": {
+        "max-hum": 90,
+        "max-temp": 30,
+        "min-hum": 60,
+        "min-temp": 25,
+        "url": "https://plantvillage.org/topics/yams/infos"
+    }
 }
