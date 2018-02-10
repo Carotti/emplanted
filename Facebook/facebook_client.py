@@ -426,6 +426,32 @@ class Thefish(Client):
                         if text_list[plant_name_ind] in self.inside_tank:
                             self.inside_tank.remove(text_list[plant_name_ind])
                             self.acknowledge_plant()
+            elif "suggest" in text or "recommend" in text:
+                temp_no_of_days = len(self.daily_stats["temp"])
+                hum_no_of_days = len(self.daily_stats["hum"])
+                if (temp_no_of_days == 0) or (hum_no_of_days == 0):
+                    self.send_msg("I need to monitor you plants for at least one day before making suggestions!")
+                else:
+                    avg_temp = sum(self.daily_stats["temp"])/temp_no_of_days
+                    max_temp = max(self.daily_stats["temp"])
+                    min_temp = min(self.daily_stats["temp"])
+                    self.send_msg("Your daily average temperature for the last " + str(temp_no_of_days) + " days has a mean of " + str(avg_temp) + u'\U000000B0' + "C")
+                    self.send_msg("and a maximum temperature of " + str(max_temp) + " and a minimum temperature of " + str(min_temp))
+                    avg_hum = sum(self.daily_stats["hum"])/hum_no_of_days
+                    max_hum = max(self.daily_stats["hum"])
+                    min_hum = min(self.daily_stats["hum"])
+                    self.send_msg("Your daily average humidity for the last " + str(hum_no_of_days) + " days has a mean of " + str(avg_hum) + "%")
+                    self.send_msg("and a maximum humidity of " + str(max_hum) + " and a minimum humidity of " + str(min_hum))
+                    plant_recommendations = []
+                    for plant_name in self.plant_data:
+                        good_min_temp = (self.plant_data[plant_name]["min-temp"] < min_temp)
+                        good_max_temp = (self.plant_data[plant_name]["max-temp"] > max_temp)
+                        good_min_hum = (self.plant_data[plant_name]["min-hum"] < min_hum)
+                        good_max_hum = (self.plant_data[plant_name]["max-hum"] > max_hum)
+                        plant_recommendations.append(plant_name)
+                    chosen_plant = plant_recommendations[random.randint(0,len(plant_recommendations) - 1)]
+                    self.send_msg("This environment is ideal for growing: " + chosen_plant)
+
             elif "tell me about " in text or ("how " in text and "do" in text):
                 plant_name = ""
                 for name in text_list:

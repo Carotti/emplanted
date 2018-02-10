@@ -926,7 +926,7 @@
     "rosemary": {
         "max-hum": 90,
         "max-temp": 24,
-        "min-hum": 60,
+        "min-hum": 10,
         "min-temp": 6,
         "url": "https://plantvillage.org/topics/rosemary/infos"
     },
