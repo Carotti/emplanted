@@ -1091,6 +1091,13 @@
         "min-temp": 16,
         "url": "https://plantvillage.org/topics/walnut/infos"
     },
+    "watercress": {
+        "max-hum": 90,
+        "max-temp": 6.7,
+        "min-hum": 60,
+        "min-temp": 6.0,
+        "url": "https://plantvillage.org/topics/cress/infos"
+    },
     "watermelon": {
         "max-hum": 90,
         "max-temp": 28,
