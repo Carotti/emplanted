@@ -1094,7 +1094,7 @@
     "watercress": {
         "max-hum": 90,
         "max-temp": 6.7,
-        "min-hum": 60,
+        "min-hum": 70,
         "min-temp": 6.0,
         "url": "https://plantvillage.org/topics/cress/infos"
     },
