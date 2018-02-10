@@ -247,9 +247,9 @@ class Thefish(Client):
         if current_date_time.date() != self.old_dt.date():
             self.daily_stats["temp"].append(sum(self.tank_stats["temp"])/max(len(self.tank_stats["temp"]), 1))
             self.daily_stats["hum"].append(sum(self.tank_stats["hum"])/max(len(self.tank_stats["hum"]), 1))
-            if len(self.daily_stats["temp"]) > 64:
+            if len(self.daily_stats["temp"]) > 365:
                 self.daily_stats["temp"] = self.daily_stats["temp"][1:]
-            if len(self.daily_stats["hum"]) > 64:
+            if len(self.daily_stats["hum"]) > 365:
                 self.daily_stats["hum"] = self.daily_stats["hum"][1:]
             self.tank_stats = {"temp": [], "hum": []}
             self.unhappy_plants = {"too cold": [], "too hot": [], "too dry": [], "too humid": []}
@@ -458,8 +458,10 @@ class Thefish(Client):
                                 chosen_plant = plant_name
                     if chosen_plant:
                         self.send_msg(self.username + ", your smart planter is ideal for growing " + chosen_plant)
+                    else:
+                        self.send_msg("I don't have any recommendations at the moment.")
 
-            elif "tell me about " in text or ("how " in text and "do" in text):
+            elif "tell me about " in text or ("how " in text and "do" in text_list):
                 plant_name = ""
                 for name in text_list:
                     if name in self.plant_data:

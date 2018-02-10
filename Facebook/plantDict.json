@@ -932,9 +932,9 @@
     },
     "rosemary": {
         "max-hum": 90,
-        "max-temp": 24,
+        "max-temp": 35,
         "min-hum": 10,
-        "min-temp": 6,
+        "min-temp": -1,
         "url": "https://plantvillage.org/topics/rosemary/infos"
     },
     "rutabaga": {
