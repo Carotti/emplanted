@@ -62,6 +62,13 @@
         "min-temp": 16,
         "url": "https://plantvillage.org/topics/asparagus/infos"
     },
+    "aubergine": {
+        "max-hum": 90,
+        "max-temp": 32,
+        "min-hum": 60,
+        "min-temp": 26,
+        "url": "https://plantvillage.org/topics/eggplant/infos"
+    },
     "avocado": {
         "max-hum": 90,
         "max-temp": 33,
@@ -279,6 +286,13 @@
         "min-temp": 16,
         "url": "https://plantvillage.org/topics/chives/infos"
     },
+    "cilantro": {
+        "max-hum": 70,
+        "max-temp": 27,
+        "min-hum": 60,
+        "min-temp": 17,
+        "url": "https://plantvillage.org/topics/coriander-cilantro/infos"
+    },
     "cinnamon": {
         "max-hum": 90,
         "max-temp": 28,
@@ -398,6 +412,13 @@
         "min-temp": 16,
         "url": "https://plantvillage.org/topics/dill/infos"
     },
+    "durian": {
+        "max-hum": 90,
+        "max-temp": 28,
+        "min-hum": 60,
+        "min-temp": 20,
+        "url": "https://en.wikipedia.org/wiki/durian"
+    },
     "eggplant": {
         "max-hum": 90,
         "max-temp": 32,
@@ -516,6 +537,13 @@
         "min-hum": 60,
         "min-temp": 15.5,
         "url": "https://plantvillage.org/topics/horseradish/infos"
+    },
+    "jackfruit": {
+        "max-hum": 90,
+        "max-temp": 40,
+        "min-hum": 60,
+        "min-temp": 15,
+        "url": "https://www.crfg.org/pubs/ff/jackfruit.html"
     },
     "kale": {
         "max-hum": 90,
@@ -775,6 +803,13 @@
         "min-hum": 60,
         "min-temp": 23,
         "url": "https://plantvillage.org/topics/pineapple/infos"
+    },
+    "pitaya": {
+        "max-hum": 90,
+        "max-temp": 32,
+        "min-hum": 60,
+        "min-temp": 18,
+        "url": "http://balconygardenweb.com/how-to-grow-dragon-fruit-growing-dragonfruit-pitaya/"
     },
     "pistachio": {
         "max-hum": 90,
