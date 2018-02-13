@@ -18,7 +18,8 @@ import paho.mqtt.client as mqtt
 import time
 import datetime
 
-DEBUG = True
+DEBUG = False
+DEMO = True
 
 def get_text(url):
     html = urlopen(url).read()
@@ -66,8 +67,11 @@ class Thefish(Client):
         self.lights_schedule = [None, None]
 
         #initial tank statistics, needs to change at regular interval
+        if DEMO:
+            self.daily_stats = {"temp": [10, 20, 15, 18, 21, 25, 25],"hum": [75, 70, 76, 75, 78, 77, 74]}
+        else:
+            self.daily_stats = {"temp": [], "hum": []}
         self.tank_stats = {"temp": [], "hum": []}
-        self.daily_stats = {"temp": [], "hum": []}
 
         self.unhappy_plants = {"too cold": [], "too hot": [], "too dry": [], "too humid": []}
 
@@ -101,6 +105,8 @@ class Thefish(Client):
         self.manual_hum = None
 
         self.manual_temp = None
+
+        self.always_off = False
 
         #Startup greeting
         if not DEBUG:
@@ -186,7 +192,7 @@ class Thefish(Client):
             self.send_refill_msg = True
         elif hum_dev < -10:
             # increase_hum()
-            if (self.send_refill_msg) and (len(self.hum_dev_history) >= 25) and ((sum(self.hum_dev_history)/len(self.hum_dev_history))) < -10:
+            if (self.send_refill_msg) and (len(self.hum_dev_history) >= 100) and ((sum(self.hum_dev_history)/len(self.hum_dev_history))) < -10:
                 self.send_refill_msg = False
                 self.send_msg("Please refill my water tank " + u'\U0001F6B1')
         else:
@@ -228,19 +234,19 @@ class Thefish(Client):
         current_date_time = datetime.datetime.now()
 
         if self.lights_off_time:
-            if current_date_time.time() == self.lights_off_time:
+            if current_date_time.time() >= self.lights_off_time:
                 self.lights_off()
                 self.lights_off_time = None
         if self.lights_on_time:
-            if current_date_time.time() == self.lights_on_time:
+            if current_date_time.time() >= self.lights_on_time:
                 self.lights_on()
                 self.lights_on_time = None
 
         # On time, off time
         if self.lights_schedule[0]:
-            if current_date_time.time() == self.lights_schedule[0]:
+            if current_date_time.time() >= self.lights_schedule[0]:
                 self.lights_on()
-            elif current_date_time.time() == self.lights_schedule[1]:
+            elif current_date_time.time() >= self.lights_schedule[1]:
                 self.lights_off()
 
 
@@ -260,14 +266,17 @@ class Thefish(Client):
         if self.display_status:
             self.display_status = False
             self.send_msg("The temperature inside the planter is " + str(info_dict["temp"]) + u'\U000000B0' + "C and the humidity is " + str(info_dict["hum"]) + "%.")
-            if self.manual_temp != None:
-                self.send_msg("The target temperature is manually set to " + str(self.manual_temp) + u'\U000000B0' + "C")
+            if not self.always_off:
+                if self.manual_temp != None:
+                    self.send_msg("The target temperature is manually set to " + str(self.manual_temp) + u'\U000000B0' + "C")
+                else:
+                    self.send_msg("The target temperature is optimal for the plants inside the tank")
+                if self.manual_hum != None:
+                    self.send_msg("The target humidity is manually set to " + str(self.manual_hum) + "%")
+                else:
+                    self.send_msg("The target humidity is optimal for the plants inside the tank")
             else:
-                self.send_msg("The target temperature is optimal for the plants inside the tank")
-            if self.manual_hum != None:
-                self.send_msg("The target humidity is manually set to " + str(self.manual_hum) + "%")
-            else:
-                self.send_msg("The target humidity is optimal for the plants inside the tank")
+                self.send_msg("The environment is no longer being monitored (turn monitoring on by replying 'Set environment automatically')")
 
     def lights_off(self):
         client.publish('esys/emplanted/lights', bytes("OFF", 'utf-8'))
@@ -287,9 +296,9 @@ class Thefish(Client):
 
     def set_delay_schedule(self, on, time):
         if on:
-            self.lights_on_time = time
+            self.lights_on_time = time.time()
         else:
-            self.lights_off_time = time
+            self.lights_off_time = time.time()
 
     def acknowledge_plant(self):
         #Acknowledge that tank plants have changed
@@ -328,9 +337,11 @@ class Thefish(Client):
             target_temp = (max_min_temp + min_max_temp)/2
             target_hum = (max_min_hum + min_max_hum)/2
             if temp_override != None:
+                self.always_off = False
                 target_temp = temp_override
                 self.manual_temp = temp_override
             if hum_override != None:
+                self.always_off = False
                 target_hum = hum_override
                 self.manual_hum = hum_override
             target_payload = json.dumps([target_temp, target_hum])
@@ -371,7 +382,7 @@ class Thefish(Client):
         while "to" in text_list:
             text_list.remove("to")
 
-        float_pattern = re.compile("-?\d+\.?\d*")
+        float_pattern = re.compile("-?\d+\.?\d*$")
 
         #All the response stuff goes here
         if (thread_id == self.fish_tank_thread_id) and ((message_object.text).lower() not in self.exclude_text):
@@ -466,6 +477,8 @@ class Thefish(Client):
                 for name in text_list:
                     if name in self.plant_data:
                         plant_name = name
+                    elif name[:-1] in self.plant_data:
+                        plant_name = name[:-1]
 
                 if plant_name:
                     if "grow" in text or "care" in text or "requirements" in text:
@@ -489,16 +502,22 @@ class Thefish(Client):
             elif "auto" in text:
                 if DEBUG:
                     self.send_msg("BOARD IS NOW AUTO")
+                self.manual_hum = None
+                self.manual_temp = None
+                self.always_off = False
                 self.send_target()
-            elif "set" in text and "degree" in text:
+            elif "set" in text and ("temperature" in text or "degree" in text):
                 for i in range(len(text_list[:-1])):
                     if "degree" in text_list[i + 1] and float_pattern.match(text_list[i]):
                         self.send_target(temp_override = float(text_list[i]), hum_override = None)
-            elif "set" in text and ("%" in text or "percent" in text):
+            elif "set" in text and ("humidifier" in text or "%" in text or "percent" in text):
                 for i in range(len(text_list[:-1])):
                     if ("%" in text_list[i + 1] or "percent" in text_list[i + 1]) and float_pattern.match(text_list[i]):
                         self.send_target(temp_override = None, hum_override = float(text_list[i]))
             elif "turn" in text and ("spray " in text or "humidifier " in text):
+                self.manual_hum = None
+                self.manual_temp = None
+                self.always_off = True
                 if "on" in text:
                     client.publish('esys/emplanted/hum', bytes("ON", 'utf-8'))
                     if DEBUG:
@@ -508,6 +527,9 @@ class Thefish(Client):
                     if DEBUG:
                         self.send_msg("Spray OFF")
             elif "turn" in text and ("heat" in text):
+                self.manual_hum = None
+                self.manual_temp = None
+                self.always_off = True
                 if "on" in text:
                     client.publish('esys/emplanted/heat', bytes("ON", 'utf-8'))
                     if DEBUG:
@@ -518,6 +540,9 @@ class Thefish(Client):
                         self.send_msg("Heater OFF")
 
             elif "turn" in text and ("fan " in text or "vent " in text):
+                self.manual_hum = None
+                self.manual_temp = None
+                self.always_off = True
                 if "on" in text:
                     client.publish('esys/emplanted/fan', bytes("ON", 'utf-8'))
                     if DEBUG:
@@ -555,7 +580,7 @@ class Thefish(Client):
                     time_pattern = re.compile("\d+:\d+(pm)?(am)?")
                     lazy_time_pattern = re.compile("\d+(a)?(p)?m")
                     # e.g. 7 o clock
-                    lazy_time = ("clock" in text) or ((("pm" in text) or ("am" in text)) and (":" not in text))
+                    lazy_time = ("clock" in text) or ("pm" in text) or ("am" in text)
                     start_time = None
                     end_time = None
                     hours_int = 0
@@ -626,7 +651,11 @@ class Thefish(Client):
                                 self.unhappy_plants[problem].remove(plant_name)
                         self.plant_of_interest = plant_name
                 send_request()
-            if self.WelcomeDialog:
+            if "thank" in text:
+                self.send_msg("https://www.youtube.com/watch?v=79DijItQXMM")
+            elif ("hello" in text) or ("hi" in text):
+                self.send_msg("Hello!")
+            elif self.WelcomeDialog:
                 #We don't know what the name of the user is
                 if not (self.username):
                     self.username = text.title()
@@ -638,11 +667,11 @@ class Thefish(Client):
                 elif (not (self.inside_tank)) and ("my name is " not in text):
                     if text not in self.plant_data:
                         #They've specified a list of plants
-                        text.replace("and", "")
+                        text = text.replace("and", ",")
                         if "," in text:
-                            text.replace(" ", "")
+                            text = text.replace(" ", "")
                             text_list = text.split(",")
-
+                        print(text_list)
                         for plant_name in text_list:
                             if plant_name in self.plant_data:
                                 self.inside_tank.append(plant_name)

@@ -20,8 +20,7 @@ boardConfig = {
             "fan",
             "heat",
             "hum",
-            "target",
-            "sleep"
+            "target"
         ]
     },
     "th-sensor": {
@@ -45,13 +44,19 @@ boardConfig = {
         "pin": 13,
         "default-state": 1
     },
-    "humidifer": {
-        "pin": 15,
+    "humidifier": {
+        "pin": 12,
         "default-state": 1
     },
     "heater": {
-        "pin": 12,
+        "pin": 2,
         "default-state": 1
+    },
+    "thresholds": {
+        "temp-lo" : 0.9,
+        "temp-hi" : 1.1,
+        "hum-lo" : 0.9,
+        "hum-hi" : 1.1
     }
 }
 
@@ -80,13 +85,25 @@ class THSensor:
 # ACTIVE LOW output
 class Output:
     def __init__(self, config):
+        self.on = False
         self.pin = Pin(config["pin"], Pin.OUT)
         self.pin.value(config["default-state"])
 
     def enable(self):
+        self.on = True
         self.pin.value(0)
 
     def disable(self):
+        self.on = False
+        self.pin.value(1)
+
+    def isOn(self):
+        return self.on
+
+    def toggle(self):
+        self.on = not self.on
+        self.pin.value(0)
+        time.sleep(0.2)
         self.pin.value(1)
 
 class EmplantedBoard:
@@ -115,9 +132,12 @@ class EmplantedBoard:
         self.outputs = {
             "lights" : Output(config["lights"]),
             "fan" : Output(config["fan"]),
-            "hum" : Output(config["humidifer"]),
             "heat" : Output(config["heater"])
         }
+
+        self.humidifier = Output(config["humidifier"])
+
+        self.thresholds = config["thresholds"]
 
         self.targetTemp = None
         self.targetHum = None
@@ -157,17 +177,22 @@ class EmplantedBoard:
         currentTemp = self.thSensor.getTemp()
         currentHum = self.thSensor.getHum()
         if (self.targetTemp != None) and (self.targetHum != None):
-            if currentTemp < self.targetTemp:
+            if currentTemp < self.thresholds["temp-lo"] * self.targetTemp:
                 self.outputs["heat"].enable()
-            else:
+
+            if currentTemp > self.thresholds["temp-hi"] * self.targetTemp:
                 self.outputs["heat"].disable()
-            if currentHum < self.targetHum:
-                self.outputs["hum"].enable()
-            else:
-                self.outputs["hum"].disable()
-            if ((currentHum - self.targetHum) + (currentTemp - self.targetTemp)) > 0:
+
+            if currentHum > self.thresholds["hum-lo"] * self.targetHum and self.humidifier.isOn():
+                self.humidifier.toggle()
+
+            if currentHum < self.thresholds["hum-lo"] * self.targetHum and not self.humidifier.isOn():
+                self.humidifier.toggle()
+
+            if currentHum > self.thresholds["hum-hi"] * self.targetHum:
                 self.outputs["fan"].enable()
-            else:
+
+            if currentHum < self.thresholds["hum-hi"] * self.targetHum:
                 self.outputs["fan"].disable()
 
     def mqttReceived(self, topic, msg):
@@ -178,6 +203,13 @@ class EmplantedBoard:
             self.mqttReceivedRequest(msgStr)
         elif topicStr == (self.mqttTopic + "target"):
             self.mqttSetTarget(msgStr)
+        elif topicStr == (self.mqttTopic + "hum"):
+            if msgStr == "ON" and not self.humidifier.isOn():
+                self.humidifier.toggle()
+                self.disableAuto("hum")
+            if msgStr == "OFF" and self.humidifier.isOn():
+                self.humidifier.toggle()
+                self.disableAuto("hum")
         else:
             for o in self.outputs:
                 if topicStr == (self.mqttTopic + o):

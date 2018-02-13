@@ -53,7 +53,7 @@ smart light cycles:
 	e.g. turn the lights off in 1 and a quarter hours
 	e.g. turn the lights on everyday at 9am and off at 6pm
 	e.g. turn the lights on everyday at 6:42 and off at 19:49
-	e.g. turn the lights on everday at 8:43am and off at 20:00
+	e.g. turn the lights on everyday at 8:43am and off at 20:00
 	e.g. turn the lights on daily at 9am for 10 hours
 	e.g. turn the lights on daily at 9:32 for 9 hours
 	e.g. turn the lights on everyday at 8am for 90 minutes
