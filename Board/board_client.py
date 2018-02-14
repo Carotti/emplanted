@@ -5,6 +5,7 @@ import machine
 import time
 import json
 
+#Dictionary containing configuration for the WiFi network, mqtt and I/O
 boardConfig = {
     "network": {
         "ssid": "emplanted-wifi",
@@ -85,7 +86,7 @@ class THSensor:
 # ACTIVE LOW output
 class Output:
     def __init__(self, config):
-        self.on = False
+        self.on = False #Used to get on/off for humidity
         self.pin = Pin(config["pin"], Pin.OUT)
         self.pin.value(config["default-state"])
 
@@ -100,14 +101,16 @@ class Output:
     def isOn(self):
         return self.on
 
+    #This is necessary for the humidity sensor
     def toggle(self):
-        self.on = not self.on
+        self.on = not self.on #toggle on -> off or off -> on
         self.pin.value(0)
-        time.sleep(0.2)
+        time.sleep(0.2) #required so board can sense the toggle
         self.pin.value(1)
 
 class EmplantedBoard:
     def __init__(self, config):
+        #setup the network
         ap_if = network.WLAN(network.AP_IF)
         ap_if.active(False)
 
@@ -116,9 +119,11 @@ class EmplantedBoard:
         sta_if.active(True)
         sta_if.connect(config["network"]["ssid"], config["network"]["password"])
 
+        #wait until connected
         while not sta_if.isconnected():
             machine.idle()
 
+        #subscribe to the MQTT topics
         self.mqttClient = MQTTClient(config["mqtt"]["name"], config["mqtt"]["broker"])
         self.mqttTopic = config["mqtt"]["topic"]
         self.mqttClient.set_callback(self.mqttReceived)
@@ -134,9 +139,9 @@ class EmplantedBoard:
             "fan" : Output(config["fan"]),
             "heat" : Output(config["heater"])
         }
-
+        # Create the humidifier output as it needs toggle instead of on and off
         self.humidifier = Output(config["humidifier"])
-
+        # Config the control thresholds
         self.thresholds = config["thresholds"]
 
         self.targetTemp = None
@@ -147,7 +152,7 @@ class EmplantedBoard:
         if output != "lights":
             self.targetTemp = None
             self.targetHum = None
-
+    # Manual controls
     def mqttReceivedOutput(self, o, msg):
         if msg == "ON":
             self.outputs[o].enable()
@@ -156,6 +161,7 @@ class EmplantedBoard:
             self.outputs[o].disable()
             self.disableAuto(o)
 
+    # FB client requests sensor info
     def mqttReceivedRequest(self, msg):
         requests = json.loads(msg)
         readings = {}
@@ -168,15 +174,18 @@ class EmplantedBoard:
             readings[i] = reading
         self.mqttPublish("readings", json.dumps(readings))
 
+    # Set the target temperature and humidity based on FB client message
     def mqttSetTarget(self, msg):
         tempHumTarget = json.loads(msg)
         self.targetTemp = float(tempHumTarget[0])
         self.targetHum = float(tempHumTarget[1])
 
+    # Check that environment is inside the threshold, if not try to get it inside.
     def monitorEnvironment(self):
         currentTemp = self.thSensor.getTemp()
         currentHum = self.thSensor.getHum()
         if (self.targetTemp != None) and (self.targetHum != None):
+            # Check target has been set
             if currentTemp < self.thresholds["temp-lo"] * self.targetTemp:
                 self.outputs["heat"].enable()
 
@@ -195,10 +204,12 @@ class EmplantedBoard:
             if currentHum < self.thresholds["hum-hi"] * self.targetHum:
                 self.outputs["fan"].disable()
 
+    # Send message to correct function for processing
     def mqttReceived(self, topic, msg):
         topicStr = topic.decode("utf-8")
         msgStr = msg.decode("utf-8")
 
+        # check which stream it is from and call processing function
         if topicStr == (self.mqttTopic + "request"):
             self.mqttReceivedRequest(msgStr)
         elif topicStr == (self.mqttTopic + "target"):
@@ -210,7 +221,7 @@ class EmplantedBoard:
             if msgStr == "OFF" and self.humidifier.isOn():
                 self.humidifier.toggle()
                 self.disableAuto("hum")
-        else:
+        else: #It is a manual control MQTT message
             for o in self.outputs:
                 if topicStr == (self.mqttTopic + o):
                     self.mqttReceivedOutput(o, msgStr)
