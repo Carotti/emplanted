@@ -1,4 +1,4 @@
-body {
+componentfpgamyresizedshifted2body {
   font-family: 'Lato', 'Helvetica Neue', Helvetica, Arial, sans-serif;
 }
 
@@ -128,7 +128,7 @@ footer.footer {
 header.mastheadWorks {
   position: relative;
   background-color: #343a40;
-  background: url("../img/componentfpgamyresized.png") no-repeat center center;
+  background: url("../img/componentfpgamyresizedshifted2.png") no-repeat center center;
   -webkit-background-size: cover;
   -moz-background-size: cover;
   -o-background-size: cover;
@@ -157,6 +157,43 @@ header.mastheadWorks h1 {
     padding-bottom: 12rem;
   }
   header.mastheadWorks h1 {
+    font-size: 3rem;
+  }
+}
+
+
+header.mastheadUsage {
+  position: relative;
+  background-color: #343a40;
+  background: url("../img/bg-masthead-1.jpg") no-repeat center center;
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+  background-size: cover;
+  padding-top: 8rem;
+  padding-bottom: 8rem;
+}
+
+header.mastheadUsage .overlay {
+  position: absolute;
+  background-color: #212529;
+  height: 100%;
+  width: 100%;
+  top: 0;
+  left: 0;
+  opacity: 0.3;
+}
+
+header.mastheadUsage h1 {
+  font-size: 2rem;
+}
+
+@media (min-width: 768px) {
+  header.mastheadUsage {
+    padding-top: 12rem;
+    padding-bottom: 12rem;
+  }
+  header.mastheadUsage h1 {
     font-size: 3rem;
   }
 }
