@@ -14,7 +14,7 @@ TODO:
 | Should                      |                                                                         |              |
 | Water control               | Use valve to get water out of tank.                                     | Replaced     |
 | Heater control              | Buy a heater                                                            | Yup          |
-| Humidity control            | Humidifier                                                              | Done         |
+| Humidity control            | Humidifier                                                              | Yup          |
 | Could                       |                                                                         |              |
 | Height warning              | IR beam break sensor                                                    | Nope         |
 | Colour Temperature          | Use 2 relays to turn lights on/off                                      | Nope         |
