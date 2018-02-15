@@ -135,7 +135,7 @@ class Thefish(Client):
 
         #Startup greeting
         if not DEBUG:
-            self.send_msg("Hi, I am your new smart garden :) ! What may I call you?")
+            self.send_msg("Hi, I am your new smart planter :) ! What may I call you?")
 
     def send_msg(self, msg):
         #send a message
